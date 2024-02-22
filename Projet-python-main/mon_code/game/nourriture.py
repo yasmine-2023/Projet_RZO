@@ -17,6 +17,8 @@ class Nourriture():
  
         self.x=0
         self.y=0
+        self.parties = {} #la clef c'est une chaine de caractere (ex MC1) et la valeur c'est l'objet joueur  
+                          #on stocke uniquement les nouritures qui n'ont pas encore étaient consommées 
     @classmethod
     def set_parametres(cls,energy_food, **d):
         cls.dflt_energy_nourriture=float(energy_food)

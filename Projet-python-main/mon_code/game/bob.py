@@ -59,6 +59,11 @@ class Bob():
         self.eBirth_SR=self.dflt_eBirth_SR
 
 
+        ##########################Partie RZO################
+
+        self.joueur = None
+
+
     @classmethod
     def set_parametres(cls, eSpawn, eMax, eMother, eBirth, velocity,Mutv,mass,perception_score,Mut_m,Mut_p,Mut_mem,e_SR,eBirth_SR, **d):
         cls.dflt_eSpawn=int(eSpawn)
