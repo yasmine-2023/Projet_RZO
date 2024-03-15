@@ -4,6 +4,8 @@ from  game.jeu import *
 class Joueur:
     def __init__(self):
         self.liste_bobs = []
+        self.list_nourriture=[]
+        self.id = 0
 
     def ajouter_bob(self, bob):
         self.liste_bobs.append(bob)
