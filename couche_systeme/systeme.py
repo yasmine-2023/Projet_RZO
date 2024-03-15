@@ -9,10 +9,10 @@ from typing import TypedDict, Optional
 # from class_types.buildind_types import BuildingTypes
 # from class_types.network_commands_types import NetworkCommandsTypes
 # from class_types.road_types import RoadTypes
-
-
-
 # from class_types.buildind_types import BuildingTypes
+
+
+#---communiquer avec un programme client C en utilisant des sockets---
 
 class Header(TypedDict):
     player_id: int
@@ -178,5 +178,42 @@ class SystemInterface:
     def close_socket(self):
         self.connection.close()
         self.sock.close()
+
+
+def send_world_data(self):
+    from mon_code.game.jeu import Jeu  # Importez la classe Jeu si ce n'est pas déjà fait
+    import json
+
+    # Récupérez l'instance de Jeu pour accéder au dictionnaire world
+    jeu_instance = Jeu.get_instance()
+    world_data = jeu_instance.world
+
+    # Sérialisez le dictionnaire world en JSON
+    serialized_world_data = json.dumps(world_data)
+
+    # Envoyez le dictionnaire world au client C
+    self.send_message(command=400, id_object=1, data=serialized_world_data)
+
+
+def receive_world_data(self):
+    import json
+    from mon_code.game.jeu import Jeu  # Importez la classe Jeu si ce n'est pas déjà fait
+
+    # Utilisez read_message() pour recevoir le message envoyé par l'autre joueur
+    message = self.read_message()
+
+    # Vérifiez si un message a été reçu et si la commande correspond à la réception des données du monde
+    if message and message["header"]["command"] == 400:
+        # Extrayez les données du dictionnaire du message
+        serialized_world_data = message["data"]
+        
+        # Décodez les données JSON pour obtenir le dictionnaire du monde
+        world_data = json.loads(serialized_world_data)
+        
+        # Utilisez le dictionnaire du monde dans votre application
+        jeu_instance = Jeu.get_instance()
+        jeu_instance.world = world_data
+
+
 
   
