@@ -95,17 +95,19 @@ class Jeu():
                     if bob.est_mort:
                         bob.effacer_bob(self.world,case)
  
-    def genere_objet(self,option):
+    def genere_objet(self,option,proprietere=None):
         if option=="bob":
-            nb_objet=self.nb_bobs 
+            nb_objet=self.nb_bobs
         elif option=="nourriture":
             nb_objet=self.totale_nourriture
             
         for _ in range(nb_objet):
             if option=="bob":
-                new_objet = Bob()  
+                new_objet = Bob()
+                new_objet.set_proprietaire(proprietere)  
             if option=="nourriture":
                 new_objet= Nourriture()
+                new_objet.set_proprietaire(proprietere)
 
             pos_i = random.randint(0, self.world_x - 1)
             pos_j = random.randint(0, self.world_y - 1)
@@ -119,9 +121,10 @@ class Jeu():
                 if len(self.world[pos])==0:            
                     del self.world[pos]
 
-    def genere_nourriture(self):
+    def genere_nourriture(self,proprietere=None):
         for _ in range(self.totale_nourriture):
             new_objet= Nourriture()
+            new_objet.set_proprietaire(proprietere)
             
             pos_i = random.randint(0, self.world_x - 1)
             pos_j = random.randint(0, self.world_y - 1)

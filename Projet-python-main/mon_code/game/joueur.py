@@ -1,25 +1,34 @@
 from game.methods import *
 from  game.bob import *
 from  game.jeu import *
+nbjoueur=0
 class Joueur:
-    def __init__(self):
-        self.liste_bobs = []
-        self.list_nourriture=[]
-        self.id = 0
-
-    def ajouter_bob(self, bob):
-        self.liste_bobs.append(bob)
-        # verifier si il faut ajouter dans le dictionnaire world 
-        
+   
     
-    def supprimer_bob_joueur(self, bob,world):
-        if bob in self.liste_bobs:
-            self.liste_bobs.remove(bob)
-            if bob in world:
-                position = bob.get_position()
-                bob.effacer_bob(world,position)
-            
-            
+    # def supprimer_bob_joueur(self, bob,world):
+    #     if bob in self.liste_bobs:
+    #         self.liste_bobs.remove(bob)
+    #         if bob in world:
+    #             position = bob.get_position()
+    #             bob.effacer_bob(world,position)
+    
+
+        def __init__(self):  # Add other parameters if needed
+            global nbjoueur
+            self.idJoueur = nbjoueur
+            nbjoueur+=1
+            self.bobs = []
+            self.nourritures = []
+
+        def ajouter_bob(self, bob):
+            bob.proprietaire = self.idJoueur
+            self.bobs.append(bob)
+
+        def ajouter_nourriture(self, nourriture):
+            for partie in nourriture.elements:
+                partie['proprietaire'] = self.idJoueur
+            self.nourritures.append(nourriture)
+                
 
 
         

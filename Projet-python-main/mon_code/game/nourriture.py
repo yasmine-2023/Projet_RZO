@@ -5,6 +5,9 @@ La classe `Nourriture` représente un objet de nourriture dans le jeu.
 """
 ########################################################
 
+import random
+
+
 num_nourriture=0
     
 class Nourriture():
@@ -14,14 +17,15 @@ class Nourriture():
         global num_nourriture
         self.id=num_nourriture
         num_nourriture+=1
- 
         self.x=0
         self.y=0
-        self.elements = () #la clef c'est une chaine de caractere (ex MC1) et la valeur c'est l'objet joueur  
-                          #on stocke uniquement les nouritures qui n'ont pas encore étaient consommées 
+        self.nombre_parties = random.randint(0, 5)
+        self.parties = [{'energie': self.energie_nourriture / self.nombre_parties, 'proprietaire': None, 'locked': False} for _ in range(self.nombre_parties)]                #on stocke uniquement les nouritures qui n'ont pas encore étaient consommées 
     @classmethod
     def set_parametres(cls,energy_food, **d):
         cls.dflt_energy_nourriture=float(energy_food)
+    def set_proprietaire(self, proprietaire):
+        self.proprietaire=proprietaire
     def get_energie(self):
         return self.energie_nourriture
     def set_energie(self, energie):
@@ -40,6 +44,23 @@ class Nourriture():
         if isinstance(other, Nourriture):
             return self.energie_nourriture == other.energie_nourriture and self.x==other.x and self.y ==other.y
         return False
+    #-------------Partie RZO----------------
+    def transferer_propriete(self, nouveau_proprietaire):
+        self.proprietaire = nouveau_proprietaire.id# Fichier nourriture.py
+    def lock_partie(self, index_partie):
+        if index_partie < len(self.elements) and not self.elements[index_partie]['locked']:
+            self.elements[index_partie]['locked'] = True
+            return True
+        return False
+
+    def unlock_partie(self, index_partie):
+        if index_partie < len(self.elements):
+            self.elements[index_partie]['locked'] = False
+            return True
+        return False
+
+
+  
     
 
  

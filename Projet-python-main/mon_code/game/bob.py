@@ -61,7 +61,7 @@ class Bob():
 
         ##########################Partie RZO################
 
-        self.joueur = None
+        self.proprietaire = None    
 
 
     @classmethod
@@ -134,6 +134,10 @@ class Bob():
     def set_position(self, x, y):
         self.x=x
         self.y=y
+
+    def set_proprietaire(self, proprietaire):
+        self.proprietaire=proprietaire
+
 
 
     def objets_visibles(self, world):
@@ -509,7 +513,7 @@ class Bob():
             del world[position]
  
 
-    def eat_food(self, world,food):
+    def eat_food(self,food):
         if (e:=self.eMax-self.eSpawn)>0:
             if e>=food.get_energie():
                 self.set_eSpawn(self.eSpawn+food.get_energie())
@@ -519,13 +523,29 @@ class Bob():
                 self.set_eSpawn(self.eSpawn+e)
                 food.set_energie(food.get_energie()-e)
     
+    def eat_partie(self, partie):
+        if (e:=self.eMax-self.eSpawn)>0:
+            if e >= partie['energie']:
+                self.set_eSpawn(self.eSpawn + partie['energie'])
+                partie['energie'] = 0
+            else:
+                self.set_eSpawn(self.eSpawn + e)
+                partie['energie'] -= e
+    
 
     def consommation(self, world, position): 
         if "nourriture" in world[position]:
             nourriture_max=world[position]["nourriture"]
-            self.eat_food(world, nourriture_max)
-            if nourriture_max.get_energie()<=0:
-                nourriture_max.effacer_nourriture(world, position)
+            for partie in nourriture_max.parties:
+                if partie['locked'] == False:
+                    if partie['proprietaire'] != self.proprietaire or partie['proprietaire'] is None:
+                        partie['proprietaire'].transferer_propriete(self.proprietaire)
+                    self.eat_partie(world, partie)
+                    if nourriture_max.get_energie()<=0:
+                        nourriture_max.effacer_nourriture(world, position)
+                    else :
+                        nourriture_max.unlock_partie(world, partie)
+
             
             return True
         else:
@@ -539,7 +559,25 @@ class Bob():
                     return True
         return False
     
-    
+    def consommation(self, world, position): 
+        if "nourriture" in world[position]:
+            nourriture_max=world[position]["nourriture"]
+            for partie in nourriture_max.elements:
+                if partie['lock']:  # Acquire the lock before interacting with the food part
+                    if partie['proprietaire'] is None or partie['proprietaire'] != self.id:
+                        nourriture_max.transferer_propriete(self, partie)
+                        self.eat_food(world, partie)
+                        if partie['energie'] <= 0:
+                            nourriture_max.effacer_partie(world, position, partie)
+                    # The lock is automatically released here
+            return True
+        else:
+            bobs=list(world[position]["bob"])
+            bobs.remove(self)
+        
+            if bobs:
+                b=sorted(bobs, key=lambda b: b.mass)[0]#manger le plus petit 
+
     def energy_lost(self):
         eMin = 0.5
         return max(eMin, (self.mass*(self.get_velocity()**2)+self.perception_score/5+self.memoryPoint/5))# la consommation depend de la vitesse, la masse, la perception et la memoire  
