@@ -4,6 +4,9 @@ from game.bob import *
 from game.nourriture import *
 from game.methods import *
 from game.bob import *
+from game.ftRZO import *
+from game.joueur import *
+from game.case import *
 
 eat_bob=0
 
@@ -27,9 +30,12 @@ class Jeu():
         self.age_active=age
        
         self.world = {}
-
+        self.listeCase=[]
+         #le joueur qui execute ce programme 
+        self.initialiser_case()
         self.genere_objet("bob")
         self.genere_nourriture()
+       
 
     
     def est_valide(self, coord, i, j):
@@ -95,23 +101,37 @@ class Jeu():
                     if bob.est_mort:
                         bob.effacer_bob(self.world,case)
  
-    def genere_objet(self,option,proprietere=None):
+    def genere_objet(self,option):
+        joueur = get_joueur_by_id(get_id()) # joueur = joueur1
         if option=="bob":
-            nb_objet=self.nb_bobs
-        elif option=="nourriture":
-            nb_objet=self.totale_nourriture
+            nb_objet=self.nb_bobs 
+        # elif option=="nourriture":
+        #     nb_objet=self.totale_nourriture
             
         for _ in range(nb_objet):
-            if option=="bob":
-                new_objet = Bob()
-                new_objet.set_proprietaire(proprietere)  
-            if option=="nourriture":
-                new_objet= Nourriture()
-                new_objet.set_proprietaire(proprietere)
-
             pos_i = random.randint(0, self.world_x - 1)
             pos_j = random.randint(0, self.world_y - 1)
-            ajouter(self.world,option,new_objet,pos_i,pos_j)
+            case = self.get_Case(self.listeCase,pos_i,pos_j)
+            if (case is not None and( case.je_possede_propriete()==True or case_appartient_autre_joueur(case) == False)):
+                if option=="bob":
+                    new_objet = Bob() 
+                # if option=="nourriture":
+            #     new_objet= Nourriture()
+                ajouter(self.world,option,new_objet,pos_i,pos_j)
+                joueur.ajouter_bob_au_joueur(new_objet)
+                print("succeeeeeess")
+
+            else:
+                #print("case impossible !!!!!!!!!!!!!!!")
+                self.genere_objet(option)  
+    
+
+    def get_Case(self,listeCase,x,y):
+        for case in listeCase:
+            if case.x == x and case.y == y:
+                return case
+        return None
+    
     
     def effacer_nourriture(self):
         dict_copy = dict(self.world)
@@ -121,23 +141,30 @@ class Jeu():
                 if len(self.world[pos])==0:            
                     del self.world[pos]
 
-    def genere_nourriture(self,proprietere=None):
+    def genere_nourriture(self):
+        joueur = get_joueur_by_id(get_id())
         for _ in range(self.totale_nourriture):
-            new_objet= Nourriture()
-            new_objet.set_proprietaire(proprietere)
+            
             
             pos_i = random.randint(0, self.world_x - 1)
             pos_j = random.randint(0, self.world_y - 1)
-            new_objet.x=pos_i
-            new_objet.y=pos_j
-            if (pos_i, pos_j) in self.world:
-                if "nourriture" in self.world[pos_i, pos_j]:
-                    self.world[pos_i, pos_j]["nourriture"].set_energie((self.world[pos_i, pos_j]["nourriture"].get_energie() + new_objet.get_energie()))
+            case = self.get_Case(self.listeCase,pos_i,pos_j)
+            if( case is not None and (case.je_possede_propriete()==True or case_appartient_autre_joueur(case) == False)):
+                new_objet= Nourriture()
+                new_objet.x=pos_i
+                new_objet.y=pos_j
+                if (pos_i, pos_j) in self.world:
+                    if "nourriture" in self.world[pos_i, pos_j]:
+                        self.world[pos_i, pos_j]["nourriture"].set_energie((self.world[pos_i, pos_j]["nourriture"].get_energie() + new_objet.get_energie())) 
+                    else:
+                        self.world[pos_i, pos_j]["nourriture"]=new_objet
+                        joueur.ajouter_nourriture_joueur(new_objet)
                 else:
-                    self.world[pos_i, pos_j]["nourriture"]=new_objet
+                    self.world[pos_i, pos_j]={"nourriture":new_objet}
+                    joueur.ajouter_nourriture_joueur(new_objet)
             else:
-                self.world[pos_i, pos_j]={"nourriture":new_objet}
-        
+                self.genere_nourriture()
+            
         
     def get_tick(self):
         return self.cpt_ticks
@@ -146,6 +173,13 @@ class Jeu():
     def get_tick_jour(self):
         return self.ticks_jour
 
+    def initialiser_case(self):
+        for i in range(self.world_x):
+            for j in range(self.world_y):
+                case = Case(i, j)
+                self.listeCase.append(case)
+                
+               
 
 
        
