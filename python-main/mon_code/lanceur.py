@@ -1,5 +1,4 @@
 import pygame as pg
-
 from game.game import *
 from game.menu import *
 from game.formulaire import *

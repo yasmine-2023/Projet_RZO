@@ -17,7 +17,7 @@ class Nourriture():
  
         self.x=0
         self.y=0
-        self.idjoueur= get_id()
+        self.idjoueur= get_mon_id()
     @classmethod
     def set_parametres(cls,energy_food, **d):
         cls.dflt_energy_nourriture=float(energy_food)

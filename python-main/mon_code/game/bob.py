@@ -3,6 +3,8 @@ import copy
 from game.methods import *
 from game.nourriture import *
 from game.ftRZO import *
+from game.case import *
+
 num_bob=0
     
 class Bob():
@@ -60,7 +62,7 @@ class Bob():
         self.eBirth_SR=self.dflt_eBirth_SR
 
         #-------------------------
-        self.joueur = get_joueur_by_id(get_id())
+        self.joueur = get_mon_id()
        
 
 
@@ -247,7 +249,7 @@ class Bob():
             return random.choice(positionsPossibles)
 
 
-    def move_alea(self,world, nb_lignes, nb_collones):
+    def move_alea(self,world, nb_lignes, nb_collones,listeCases):
         pos_i, pos_j= self.get_position()
         l=[]
         #mouvement à droite
@@ -266,10 +268,13 @@ class Bob():
         pos_i, pos_j=self.choisirPositionMemoire(l)
 
         self.effacer_bob(world, self.get_position())
+
+        case = get_Case(listeCases, pos_i, pos_j)
+        case.gerer_propriete()
         ajouter(world, "bob",self, pos_i, pos_j)
 
 
-    def move_to_destination(self, world, destination):
+    def move_to_destination(self, world, destination,listeCases):
         x, y=destination.get_position() 
         self.effacer_bob(world, (self.x, self.y))
         copieX=self.x
@@ -294,11 +299,12 @@ class Bob():
         if position_possibles:# si le bob est déja dans la case de sa destination 
             self.x, self.y = self.choisirPositionMemoire(position_possibles)
 
-
+        case = get_Case(listeCases, self.x, self.y)
+        case.gerer_propriete()
         ajouter(world, "bob",self, self.x, self.y)
        
 
-    def move_away(self, detected_bob, world, nb_lignes, nb_collones):
+    def move_away(self, detected_bob, world, nb_lignes, nb_collones,listeCases):
         self.effacer_bob(world, (self.x, self.y))
         copieX=self.x
         copieY=self.y
@@ -315,7 +321,8 @@ class Bob():
         position_possibles.append((self.x, copieY))
         
         self.x, self.y = self.choisirPositionMemoire(position_possibles)
-
+        case = get_Case(listeCases, self.x, self.y)
+        case.gerer_propriete()
         ajouter(world, "bob",self, self.x, self.y)
 
 
@@ -367,7 +374,7 @@ class Bob():
                     break
 
 
-    def move(self, world, nb_lignes, nb_collones):#mouvement a une case adjacente 
+    def move(self, world, nb_lignes, nb_collones,listeCases):#mouvement a une case adjacente 
         ancienX =self.x
         ancienY =self.y #pour stocker cette position dans la liste des cases à memorisées 
         nourritures_visibles, _= self.objets_visibles(world)
@@ -379,26 +386,26 @@ class Bob():
             
             closest=sorted(lp, key=lambda p: calcule_distance(p, self))[0]
            
-            self.move_away(closest, world, nb_lignes, nb_collones)
+            self.move_away(closest, world, nb_lignes, nb_collones,listeCases)
             
         else:
             if destination==None:
              
-                self.move_alea(world, nb_lignes, nb_collones)
+                self.move_alea(world, nb_lignes, nb_collones,listeCases)
 
             else:
-                self.move_to_destination(world, destination)
+                self.move_to_destination(world, destination,listeCases)
 
         self.memoriserLesNourritures(world,destination,nourritures_visibles)#on memorise les nourritures qu'on ne voit plus  
         self.memoriserCaseVisite(ancienX,ancienY)# apres avoir effectuer le deplacement vers une case on memorise la position precedente 
       
 
 
-    def deplacementParTick(self,world, position, nb_lignes, nb_collones, reproduction_parthenogenese_active, reproduction_sexuelle_active, age_active):
+    def deplacementParTick(self,world, position, nb_lignes, nb_collones, reproduction_parthenogenese_active, reproduction_sexuelle_active, age_active,listeCases):
         
         for _ in range(int(self.get_velocity())):
             
-            self.move(world, nb_lignes, nb_collones)
+            self.move(world, nb_lignes, nb_collones,listeCases)
             
             if (self.consommation(world, (self.x, self.y)) ):
                 if reproduction_sexuelle_active:

@@ -26,6 +26,12 @@ class Joueur:
                 if case.x == x and case.y == y:
                     return True
             return False
+        
+        def ajouter_case(self, case):
+            self.cases.append(case)
+
+        def effacer_case(self, case):
+            self.cases.remove(case) 
 
         
      

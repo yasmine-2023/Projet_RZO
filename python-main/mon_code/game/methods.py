@@ -140,6 +140,12 @@ def afficher(d):
     print("}") 
 
 
+
+def get_Case(listeCase,x,y):
+        for case in listeCase:
+            if case.x == x and case.y == y:
+                return case
+        return None
    
 
     
