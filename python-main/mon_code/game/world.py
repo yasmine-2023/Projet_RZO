@@ -22,6 +22,7 @@ class World:
         self.img_nourriture= self.chrg_image("tile_0047.png")
         self.img_bob= self.chrg_image("character_0005.png")
         self.img_tuile=self.chrg_image("grass.png")
+        self.img_bob_adversaire=self.chrg_image("bob_vert.png")
       
 
     def set_parametres(self,N, M, **d):
@@ -45,7 +46,18 @@ class World:
         x,y=self.calculer_x_y(i,j)
         fenetre.blit(img_bob_z, 
                         (x*zoom + fenetre.get_width()/2 +img_tuile_z.get_width()/2+img_tuile_z.get_width()*delta_x-img_bob_z.get_width()/2+ camera_x,  
-                        y*zoom +img_tuile_z.get_height()/8+img_tuile_z.get_height()*delta_y-img_bob_z.get_height()/2+ camera_y))        
+                        y*zoom +img_tuile_z.get_height()/8+img_tuile_z.get_height()*delta_y-img_bob_z.get_height()/2+ camera_y))    
+
+
+
+    def dessiner_bob_adversaire(self, i ,j, fenetre, camera_x, camera_y, zoom, masse, delta_x, delta_y):
+        masse=(masse)**(1/3)
+        img_bob_z=pg.transform.scale(self.img_bob_adversaire, ((self.img_bob_adversaire.get_width()*zoom*masse), (self.img_bob_adversaire.get_height()*zoom*masse)))          
+        img_tuile_z=pg.transform.scale(self.img_tuile, ((self.img_tuile.get_width()*zoom), (self.img_tuile.get_height()*zoom)))
+        x,y=self.calculer_x_y(i,j)
+        fenetre.blit(img_bob_z, 
+                        (x*zoom + fenetre.get_width()/2 +img_tuile_z.get_width()/2+img_tuile_z.get_width()*delta_x-img_bob_z.get_width()/2+ camera_x,  
+                        y*zoom +img_tuile_z.get_height()/8+img_tuile_z.get_height()*delta_y-img_bob_z.get_height()/2+ camera_y))    
 
 
     def dessiner_tuile(self, i, j,fenetre, camera_x, camera_y, zoom):

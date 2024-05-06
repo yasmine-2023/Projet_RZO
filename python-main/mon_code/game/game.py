@@ -10,6 +10,7 @@ from game.methods import *
 from game.menu_pause import *
 from game.boutton import *
 from game.menu import *
+from game.ftRZO import bob_joueursAdverses
  
 
 ########################################################
@@ -200,7 +201,14 @@ class Game:
                     n_food+=1
 
         self.nb_bob, self.nb_food = n_bob, n_food
+        liste_info_bob= bob_joueursAdverses()
+        for info in liste_info_bob:
+            x,y,masse=info
+            self.world.dessiner_bob_adversaire(x, y, self.screen, self.camera.mouvement.x, self.camera.mouvement.y, self.camera.zoom, masse, 0, 0)
 
+            
+
+ 
         # Pour déssiner la barre d'info des jours et du cycle jour/nuit
         self.world.draw_day_night_bar(self.screen, self.jeu.get_tick(), self.jeu.get_tick_jour())
         self.world.draw_day_count(self.screen, self.jeu.get_jour())

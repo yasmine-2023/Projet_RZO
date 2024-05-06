@@ -1,6 +1,7 @@
 from glob import glob
 import random
 from game.bob import *
+from game.ftRZO import get_mon_joueur
 from game.nourriture import *
 from game.methods import *
 from game.bob import *
@@ -177,6 +178,17 @@ class Jeu():
             for j in range(self.world_y):
                 case = Case(i, j)
                 self.listeCases.append(case)
+
+    def mesBobs(self): # retourne une liste de liste [[x,y,masse], [x,y,masse], ...]
+        liste_bobs = []
+        for case, elmts in self.world.items():
+            if "bob" in elmts:
+                for bob in elmts["bob"]:
+                    liste_bobs.append([bob.x, bob.y, bob.masse])
+        return liste_bobs
+    
+    
+        
                 
                
 

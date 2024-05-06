@@ -62,7 +62,7 @@ class Bob():
         self.eBirth_SR=self.dflt_eBirth_SR
 
         #-------------------------
-        self.joueur = get_mon_id()
+        self.proprietaire = 1
        
 
 
@@ -136,6 +136,9 @@ class Bob():
     def set_position(self, x, y):
         self.x=x
         self.y=y
+    
+    def changer_propriete(self):
+        self.proprietaire = 0
 
 
     def objets_visibles(self, world):
