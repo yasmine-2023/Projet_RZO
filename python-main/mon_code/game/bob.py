@@ -32,7 +32,7 @@ class Bob():
         self.y=0
         self.speedBuffer = 0
         self.age=0
-        self.memoryPoint=0
+        self.memoryPoint=5
         self.nb_Nouriture_Memorisable = self.memoryPoint#nb de nouritures qu'on  peut encore memoriser (espace libre) 
         self.nb_Cases_Memorisable = 2*self.memoryPoint #nb de cases qu'on peut encore memoriser (espace libre) 
 
@@ -273,7 +273,8 @@ class Bob():
         self.effacer_bob(world, self.get_position())
 
         case = get_Case(listeCases, pos_i, pos_j)
-        case.gerer_propriete()
+        if case is not None:
+            case.gerer_propriete()
         ajouter(world, "bob",self, pos_i, pos_j)
 
 
@@ -303,7 +304,8 @@ class Bob():
             self.x, self.y = self.choisirPositionMemoire(position_possibles)
 
         case = get_Case(listeCases, self.x, self.y)
-        case.gerer_propriete()
+        if case is not None:
+            case.gerer_propriete()
         ajouter(world, "bob",self, self.x, self.y)
        
 
@@ -405,7 +407,7 @@ class Bob():
 
 
     def deplacementParTick(self,world, position, nb_lignes, nb_collones, reproduction_parthenogenese_active, reproduction_sexuelle_active, age_active,listeCases):
-        
+        print ("memoryPoint",self.memoryPoint)
         for _ in range(int(self.get_velocity())):
             
             self.move(world, nb_lignes, nb_collones,listeCases)

@@ -13,7 +13,7 @@ eat_bob=0
 
 x_start=30 
 y_start=30
-
+listeCases = []
 
 class Jeu():
     def __init__(self, N, M, ticks_day,nb_bobs,foods_jour,reproduction_parthenogenese_activation,reproduction_sexuelle_activation,age, **d):        
@@ -32,7 +32,7 @@ class Jeu():
         self.age_active=age
        
         self.world = {}
-        self.listeCases=[]
+       
          #le joueur qui execute ce programme 
         self.initialiser_case()
         self.genere_objet("bob")
@@ -90,7 +90,7 @@ class Jeu():
                 for bob in list(elmts["bob"]):
                     if not bob.deja_deplace:
                         if not bob.est_mort:
-                            bob.deplacementParTick(self.world, case, self.world_x,self.world_y, self.reproduction_parthenogenese_activation, self.reproduction_sexuelle_activation, self.age_active,self.listeCases)
+                            bob.deplacementParTick(self.world, case, self.world_x, self.world_y, self.reproduction_parthenogenese_activation, self.reproduction_sexuelle_activation, self.age_active,listeCases)
                             if self.age_active:    
                                 bob.increment_age()
                             if bob.eSpawn<=0:
@@ -113,7 +113,7 @@ class Jeu():
         for _ in range(nb_objet):
             pos_i = random.randint(0, self.world_x - 1)
             pos_j = random.randint(0, self.world_y - 1)
-            case = get_Case(self.listeCases,pos_i,pos_j)
+            case = get_Case(listeCases,pos_i,pos_j)
             if (case is not None and( case.je_possede_propriete()==True or id_joueur_case(pos_i,pos_j) == False)):
                 if option=="bob":
                     new_objet = Bob() 
@@ -148,7 +148,7 @@ class Jeu():
             
             pos_i = random.randint(0, self.world_x - 1)
             pos_j = random.randint(0, self.world_y - 1)
-            case = get_Case(self.listeCases,pos_i,pos_j)
+            case = get_Case(listeCases,pos_i,pos_j)
             if( case is not None and (case.je_possede_propriete()==True or id_joueur_case(pos_i,pos_j) == False)):
                 new_objet= Nourriture()
                 new_objet.x=pos_i
@@ -177,7 +177,7 @@ class Jeu():
         for i in range(self.world_x):
             for j in range(self.world_y):
                 case = Case(i, j)
-                self.listeCases.append(case)
+                listeCases.append(case)
 
     def mesBobs(self): # retourne une liste de liste [[x,y,masse], [x,y,masse], ...]
         liste_bobs = []
