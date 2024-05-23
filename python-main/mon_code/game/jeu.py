@@ -1,19 +1,21 @@
 from glob import glob
 import random
 from game.bob import *
-from game.ftRZO import get_mon_joueur
+
 from game.nourriture import *
 from game.methods import *
 from game.bob import *
 from game.ftRZO import *
 from game.joueur import *
 from game.case import *
+from game.ftRZO import Interface
+#from game.traitement import *
 
 eat_bob=0
 
 x_start=30 
 y_start=30
-listeCases = []
+#global idjoueur 
 
 class Jeu():
     def __init__(self, N, M, ticks_day,nb_bobs,foods_jour,reproduction_parthenogenese_activation,reproduction_sexuelle_activation,age, **d):        
@@ -32,13 +34,22 @@ class Jeu():
         self.age_active=age
        
         self.world = {}
-       
+        self.listeCases=[]
+
          #le joueur qui execute ce programme 
         self.initialiser_case()
+        self.interface = Interface(self)
+        self.interface.start_game()
+        self.joueur=Joueur(self.interface.create_id())
+        self.idjoueur =self.interface.get_mon_id()
         self.genere_objet("bob")
         self.genere_nourriture()
-       
 
+    def get_mon_interface(self):
+        return self.interface
+       
+    def get_mon_joueur(self):
+        return self.joueur
     
     def est_valide(self, coord, i, j):
         x, y = coord
@@ -90,7 +101,7 @@ class Jeu():
                 for bob in list(elmts["bob"]):
                     if not bob.deja_deplace:
                         if not bob.est_mort:
-                            bob.deplacementParTick(self.world, case, self.world_x, self.world_y, self.reproduction_parthenogenese_activation, self.reproduction_sexuelle_activation, self.age_active,listeCases)
+                            bob.deplacementParTick(self.world, case, self.world_x,self.world_y, self.reproduction_parthenogenese_activation, self.reproduction_sexuelle_activation, self.age_active,self.listeCases)
                             if self.age_active:    
                                 bob.increment_age()
                             if bob.eSpawn<=0:
@@ -102,9 +113,10 @@ class Jeu():
                     bob.deja_deplace=False
                     if bob.est_mort:
                         bob.effacer_bob(self.world,case)
+        self.interface.give_info()
  
     def genere_objet(self,option):
-        joueur = get_mon_joueur() # joueur = joueur1
+        joueur = self.get_mon_joueur() # joueur = joueur1
         if option=="bob":
             nb_objet=self.nb_bobs 
         # elif option=="nourriture":
@@ -113,7 +125,7 @@ class Jeu():
         for _ in range(nb_objet):
             pos_i = random.randint(0, self.world_x - 1)
             pos_j = random.randint(0, self.world_y - 1)
-            case = get_Case(listeCases,pos_i,pos_j)
+            case = get_Case(self.listeCases,pos_i,pos_j)
             if (case is not None and( case.je_possede_propriete()==True or id_joueur_case(pos_i,pos_j) == False)):
                 if option=="bob":
                     new_objet = Bob() 
@@ -142,13 +154,13 @@ class Jeu():
                     del self.world[pos]
 
     def genere_nourriture(self):
-        joueur = get_mon_joueur()
+        joueur = self.get_mon_joueur()
         for _ in range(self.totale_nourriture):
             
             
             pos_i = random.randint(0, self.world_x - 1)
             pos_j = random.randint(0, self.world_y - 1)
-            case = get_Case(listeCases,pos_i,pos_j)
+            case = get_Case(self.listeCases,pos_i,pos_j)
             if( case is not None and (case.je_possede_propriete()==True or id_joueur_case(pos_i,pos_j) == False)):
                 new_objet= Nourriture()
                 new_objet.x=pos_i
@@ -177,16 +189,17 @@ class Jeu():
         for i in range(self.world_x):
             for j in range(self.world_y):
                 case = Case(i, j)
-                listeCases.append(case)
+                self.listeCases.append(case)
 
     def mesBobs(self): # retourne une liste de liste [[x,y,masse], [x,y,masse], ...]
         liste_bobs = []
         for case, elmts in self.world.items():
             if "bob" in elmts:
                 for bob in elmts["bob"]:
-                    liste_bobs.append([bob.x, bob.y, bob.masse])
+                    liste_bobs.append([bob.x, bob.y, bob.mass])
         return liste_bobs
     
+
     
         
                 

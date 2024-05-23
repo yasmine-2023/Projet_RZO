@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "*.embeddedhtml": "html",
+        "unistd.h": "c",
+        "string.h": "c",
+        "stdio.h": "c",
+        "socket.h": "c",
+        "réseaux.h": "c",
+        "stdlib.h": "c",
+        "inet.h": "c"
+    }
+}

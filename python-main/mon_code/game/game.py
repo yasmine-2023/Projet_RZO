@@ -10,7 +10,8 @@ from game.methods import *
 from game.menu_pause import *
 from game.boutton import *
 from game.menu import *
-from game.ftRZO import bob_joueursAdverses
+#from game.ftRZO import bob_joueursAdverses
+from game.ftRZO import *
  
 
 ########################################################
@@ -30,6 +31,7 @@ class Game:
         self.world = world
         self.camera = Camera(self.largeur, self.hauteur)
         self.jeu=jeu
+        self.interface = self.jeu.interface
 
         # Pour la deuxième option pour faire pause
         self.draw_pause_v2=False
@@ -201,7 +203,9 @@ class Game:
                     n_food+=1
 
         self.nb_bob, self.nb_food = n_bob, n_food
-        liste_info_bob= bob_joueursAdverses()
+        liste_info_bob= Interface.get_info_adversaire(self.interface)
+        time.sleep(1)
+        print("info bob adverssaires",liste_info_bob)
         for info in liste_info_bob:
             x,y,masse=info
             self.world.dessiner_bob_adversaire(x, y, self.screen, self.camera.mouvement.x, self.camera.mouvement.y, self.camera.zoom, masse, 0, 0)

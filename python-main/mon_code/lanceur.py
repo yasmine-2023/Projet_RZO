@@ -5,13 +5,15 @@ from game.formulaire import *
 from game.methods import *
 from game.bob import *
 
+
 ########################################################
 """
 La Lanceur permet de lancer le jeu
 """
 ########################################################
 
- 
+
+
 class Lanceur():
     def __init__(self):
        
@@ -21,7 +23,7 @@ class Lanceur():
         # Variable pour savoir si on joue / pause
         self.playing = False
         running = True
-
+        
         # Les variables 
         self.screen = pg.display.set_mode((1250,600))
         self.clock = pg.time.Clock()
@@ -31,7 +33,7 @@ class Lanceur():
         self.active_option = None
         self.input_value = ""
         
-        self.default_options={'N': '100', 'M': '100', 'ticks_day': '100', 'energy_food': '100', 'foods_jour': '100', 'nb_bobs': '100', 'eSpawn': '100', 'eMax': '200', 'eMother': '150', 'eBirth': '50',"e_SR":'150',"eBirth_SR":"100", 'Mutv': '0.1', 'Mut_m': '0.1', 'Mut_p': '1', 'Mut_mem': '1', 'velocity': '1', 'mass': '1', 'perception_score': '0', 'initial_memory_points': '0', 'reproduction_parthenogenese_activation': True, "age":False, "reproduction_sexuelle_activation":False}
+        self.default_options={'N': '10', 'M': '10', 'ticks_day': '100', 'energy_food': '100', 'foods_jour': '5', 'nb_bobs': '3', 'eSpawn': '100', 'eMax': '200', 'eMother': '150', 'eBirth': '50',"e_SR":'150',"eBirth_SR":"100", 'Mutv': '0.1', 'Mut_m': '0.1', 'Mut_p': '1', 'Mut_mem': '1', 'velocity': '1', 'mass': '1', 'perception_score': '0', 'initial_memory_points': '0', 'reproduction_parthenogenese_activation': True, "age":False, "reproduction_sexuelle_activation":False}
         self.labels_formulaire=[[("N","Height"), ("M", "Width"), ("ticks_day", "Ticks per day")], [("energy_food", "Energy per food"),("foods_jour", "Number of Food per day"), ("nb_bobs", "Initial Bob number")], [("eSpawn", "Initial energy of Bob"), ("eMax", "Maximum energy of bob"), ("eMother", "Energy lost by the mother"),("e_SR", "Energie for SR"), ("eBirth", "Initial energy of Birth"),("eBirth_SR", "Initial energy of Birth SR")], [("Mutv", "Mutation rate for velocity"), ("Mut_m", "mutation rate for mass"), ("Mut_p", "mutation rate for perception"), ("Mut_mem", "mutation rate for memory")], [("velocity", "Initial velocity"), ("mass", "Initial mass"), ("perception_score", "Initial perception score"), ("initial_memory_points", "initial memory points")]]
         self.labels_formulaire_pause=[[("N","Height"), ("M", "Width"), ("ticks_day", "Ticks per day")], [("energy_food", "Energy per food"),("foods_jour", "Number of Food per day")], [("eSpawn", "Initial energy of Bob"), ("eMax", "Maximum energy of bob"), ("eMother", "Energy lost by the mother"),("e_SR", "Energie for SR"), ("eBirth", "Initial energy of Birth"),("eBirth_SR", "Initial energy of Birth SR")], [("Mutv", "Mutation rate for velocity"), ("Mut_m", "mutation rate for mass"), ("Mut_p", "mutation rate for perception"), ("Mut_mem", "mutation rate for memory")], [("velocity", "Initial velocity"), ("mass", "Initial mass"), ("perception_score", "Initial perception score"), ("initial_memory_points", "initial memory points")]]
         self.options=self.default_options
@@ -78,7 +80,7 @@ class Lanceur():
                 sauvegarder_jeu(text, {"jeu":self.jeu, "parametres":self.options})
                 self.current="main menu" 
             else:
-                self.current="pause" 
+                self.current="pause"
         elif self.current=="reprendre":
             self.current=self.choisir_partie_sauvegardee()
             
@@ -91,7 +93,7 @@ class Lanceur():
             Nourriture.set_parametres(**self.options)
             Bob.set_parametres(**self.options)
             self.game.set_parametres(**self.options)
-            
+
         
     def choisir_partie_sauvegardee(self):
         self.button_supprimer = Bouton((2.5*self.screen.get_width()) // 4, 3.6*self.screen.get_height()//5,"./mon_code/assets/graphics/bouton.png", "./mon_code/assets/graphics/bouton2.png", "Supprimer", taille_texte = 24)
@@ -162,7 +164,7 @@ class Lanceur():
 
             pygame.display.flip()
 
-        
+
     def fonction(self, screen):
 
         # Dimensions de la fenÃªtre
@@ -204,7 +206,7 @@ class Lanceur():
                         # Ajoutez ici la logique pour le bouton Save
                     elif self.close_button.check_button(event):
                         return False, ""
-                        
+        
                         # Ajoutez ici la logique pour le bouton Close
                     elif text_field_rect.collidepoint(event.pos):
                         text_active = not text_active  # Activer/dÃ©sactiver le champ de texte
@@ -249,7 +251,7 @@ class Lanceur():
 
     def nouvelle_partie(self):
         Bob.set_parametres(**self.options)
-        self.jeu=Jeu( **self.options) 
+        self.jeu=Jeu( **self.options)
         self.world=World(int(self.options["N"]), int(self.options["M"]), self.screen.get_width(), self.screen.get_height())
         self.game=Game(self.screen, self.clock, self.jeu, self.world)
         self.jeu.tick_jour_renitialisation()

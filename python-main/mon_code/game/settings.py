@@ -32,7 +32,7 @@ night_color = (0, 0, 128)  # Bleu foncé
 # Buttons
 HEIGHT_BUTTON = 50
 WIDTH_BUTTON = 300
-GAP = 75     
+GAP = 75
 #FONT_SIZE = 15
 
 # colors

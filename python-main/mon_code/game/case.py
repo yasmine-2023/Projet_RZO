@@ -1,5 +1,5 @@
 from game.ftRZO import *
-
+#from game.traitement import *
 
 class Case:
     def __init__(self, x, y):
