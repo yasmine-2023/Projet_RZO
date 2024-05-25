@@ -16,8 +16,6 @@ def id_joueur_case(x,y):
 #A coder : le joueur dont l'id est en parametre abandonne la propriete de la case de coord (x,y)
 # cad appeler dans le programme de l'autre joueur la ft abandonner_propriete (que j'ai code dans la classe Case) a partir de l'objet case de coord (x,y)
 
-def autre_joueur_abandonne_propriete(idjoueur,x,y):
-    pass 
 
 
 
@@ -54,6 +52,10 @@ class Interface:
         self.message_lock = threading.Lock()  
         self.stop_event = Event()
         self.info_adversaire = {}
+        self.var_id_libre_ad = 1
+        self.test_id = None
+        self.demande_etat_case=-1
+        self.autre_joueur_a_la_case=0
 
     def load_library(self):
         lib = CDLL(self.library_path)
@@ -158,9 +160,18 @@ class Interface:
                     self.DeconnexionUtilisateur(dico[cle])
                 case "k":
                     self.analyse_info_adversaire(dico[cle])
-                
-                    
-    
+                case "u" :
+                    self.analyse_id_libre_ad(dico[cle])
+                case "p" :
+                    self.analyse_rep_id_libre_ad(dico[cle])
+                case "j" : 
+                    self.analyse_autre_joueur_abandonne_propriete(dico[cle])
+                case "x":
+                    self.analyse_rep_autre_joueur_abandonne_propriete(dico[cle])
+                case "v":
+                    self.analyse_autre_Joueur_Possede_Case(dico[cle])
+                case "w":
+                    self.analyse_autre_Joueur_Possede_Case(dico[cle])
 
 
 
@@ -214,11 +225,41 @@ class Interface:
         return True
 
 
+    def id_libre_adversaire(self, id) :
+        self.send_message("u,"+str(id))
+        i = 0
+        while i<10 :
+            if self.var_id_libre_ad == 0:
+                print ("la var est passe a 0")
+                self.var_id_libre_ad = 1
+                return 0
+            i+=1
+            time.sleep(0.02)
+        return 1
+
+
+    def analyse_id_libre_ad(self, tab):
+        print("je rentre dans analyse_id,"+str(tab[0])+","+str(self.idjoueur))
+        if self.idjoueur == int(tab[0]):
+            print("je vais envoye la rep a cedric:")
+            self.send_message("p,"+str(self.idjoueur))
+
+    def analyse_rep_id_libre_ad(self,tab):
+        print("je rentre dans analyse_rep_id"+str(tab[0]))
+        if self.test_id == int(tab[0]):
+            print("je suis rentre dans le if de analyse rep")
+            self.connexionUtilisateur(tab)
+            self.var_id_libre_ad = 0
+
+
+
     def create_id(self):
         for i in range(1,MAX_JOUEUR):
-            if self.id_libre(i):
+            self.test_id = i
+            if self.id_libre(i) and self.id_libre_adversaire(i):
                 self.JmeConnecte(i)
                 self.idjoueur = i
+                self.test_id = None
                 return i
             i+=1
 
@@ -238,7 +279,7 @@ class Interface:
         mon_id = self.get_mon_id()
         id_user = int(tab[0])
 
-        if( mon_id != id_user ):
+        if( mon_id != id_user):
             ma_tab = tab[1:]
             str_list = ','.join(ma_tab)
             actual_list = ast.literal_eval(str_list)
@@ -249,9 +290,79 @@ class Interface:
         for liste in self.info_adversaire.values():
             valeurs_collees.extend(liste)
         return valeurs_collees
+    
+    '''------------------------------------------------------'''
+    
+    def autre_joueur_abandonne_propriete(self,x,y):
+        self.send_message("j,"+str(self.idjoueur)+","+str(x)+","+str(y))
+        print("j'ai envoye une demande de propriete")
+        i = 0
+        while i<10 :
+            if self.demande_etat_case != -1:
+                t = self.demande_etat_case
+                self.demande_etat_case = -1
+                return t
+            i+=1
+            time.sleep(0.02)
+        return -1
 
 
-        
+
+    def analyse_autre_joueur_abandonne_propriete(self,tab):
+        id_envoyeur = int(tab[0])
+        if self.idjoueur != id_envoyeur:
+            x = int(tab[1])
+            y = int(tab[2])
+            case = get_Case(self.jeu.listeCases,x,y)
+            print("j'analyse la demande de propriete de cedric")
+            if case.je_possede_propriete() :
+                case.abandonner_propriete(self.jeu)
+                val = self.jeu.check_nourriture_existe(x,y)
+                self.send_message("x,"+str(id_envoyeur)+","+str(val))
+
+
+    def analyse_rep_autre_joueur_abandonne_propriete(self,tab):
+        if int(tab[0]) == self.idjoueur:
+            print("j'ai recus la rep de la demande de propriete")
+            self.demande_etat_case = int(tab[1])
+
+
+
+    '''------------------------------------------------------'''
+    def autre_Joueur_Possede_Case(self, x, y) :
+        self.send_message("v,"+str(self.idjoueur)+","+str(x)+","+str(y))
+        print("j'ai envoye une demande de possession de case")
+        i = 0
+        while i<10 :
+            if self.autre_joueur_a_la_case == 1:
+                self.autre_joueur_a_la_case = 0
+                return 1
+            i+=1
+            time.sleep(0.02)
+        return 0
+
+
+    def analyse_autre_Joueur_Possede_Case(self,tab):
+        id_envoyeur = int(tab[0])
+        if self.idjoueur != id_envoyeur:
+            x = int(tab[1])
+            y = int(tab[2])
+            case = get_Case(self.jeu.listeCases,x,y)
+            print("j'analyse la demande de propriete de cedric")
+            if case.je_possede_propriete() :
+                self.send_message("w,"+str(id_envoyeur)+","+str(1))
+
+    def analyse_rep_autre_Joueur_Possede_Case(self,tab):
+        if int(tab[0]) == self.idjoueur:
+            print("j'ai recus la rep de la demande de propriete")
+            self.autre_joueur_a_la_case = int(tab[1])
+
+#A coder PS:utiliser la ft get_postions_mesNourritures() de la classe jeu
+    def get_nourriture_adverssaire(self):
+        pass
+
+
+
     
 
 

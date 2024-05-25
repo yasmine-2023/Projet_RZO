@@ -23,6 +23,7 @@ class World:
         self.img_bob= self.chrg_image("character_0005.png")
         self.img_tuile=self.chrg_image("grass.png")
         self.img_bob_adversaire=self.chrg_image("bob_vert.png")
+        self.img_nourriture_adv= self.chrg_image("nourriture_adv.png")
       
 
     def set_parametres(self,N, M, **d):
@@ -58,6 +59,17 @@ class World:
         fenetre.blit(img_bob_z, 
                         (x*zoom + fenetre.get_width()/2 +img_tuile_z.get_width()/2+img_tuile_z.get_width()*delta_x-img_bob_z.get_width()/2+ camera_x,  
                         y*zoom +img_tuile_z.get_height()/8+img_tuile_z.get_height()*delta_y-img_bob_z.get_height()/2+ camera_y))    
+
+
+#################
+    def dessiner_nourriture_adversaire(self, i ,j, fenetre, camera_x, camera_y, zoom):  
+        img_nourriture_z=pg.transform.scale(self.img_nourriture_adv, ((self.img_nourriture.get_width()*zoom), (self.img_nourriture.get_height()*zoom)))   
+        img_tuile_z=pg.transform.scale(self.img_tuile, ((self.img_tuile.get_width()*zoom), (self.img_tuile.get_height()*zoom)))
+        x,y=self.calculer_x_y(i,j)
+        fenetre.blit(img_nourriture_z, 
+                        (x*zoom + fenetre.get_width()/2+img_tuile_z.get_width()/2-img_nourriture_z.get_width()/2 + camera_x,  
+                        y*zoom + img_tuile_z.get_height()/4- img_nourriture_z.get_height()/2 + camera_y))
+        
 
 
     def dessiner_tuile(self, i, j,fenetre, camera_x, camera_y, zoom):

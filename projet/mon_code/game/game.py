@@ -203,12 +203,20 @@ class Game:
                     n_food+=1
 
         self.nb_bob, self.nb_food = n_bob, n_food
-        liste_info_bob= Interface.get_info_adversaire(self.interface)
+        liste_info_bob= self.interface.get_info_adversaire()
         time.sleep(1)
         print("info bob adverssaires",liste_info_bob)
         for info in liste_info_bob:
             x,y,masse=info
             self.world.dessiner_bob_adversaire(x, y, self.screen, self.camera.mouvement.x, self.camera.mouvement.y, self.camera.zoom, masse, 0, 0)
+        
+        liste_info_nourriture= self.interface.get_nourriture_adverssaire()
+        print("info nourriture adverssaires",liste_info_nourriture)
+        for info in liste_info_nourriture:
+            x,y=info
+            self.world.dessiner_nourriture_adversaire(x, y, self.screen, self.camera.mouvement.x, self.camera.mouvement.y, self.camera.zoom)
+
+        
 
             
 

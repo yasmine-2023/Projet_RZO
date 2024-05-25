@@ -5,6 +5,7 @@ from game.nourriture import *
 from game.ftRZO import *
 from game.case import *
 
+
 num_bob=0
     
 class Bob():
@@ -252,7 +253,7 @@ class Bob():
             return random.choice(positionsPossibles)
 
 
-    def move_alea(self,world, nb_lignes, nb_collones,listeCases):
+    def move_alea(self,world, nb_lignes, nb_collones,listeCases,interface):
         pos_i, pos_j= self.get_position()
         l=[]
         #mouvement à droite
@@ -273,11 +274,11 @@ class Bob():
         self.effacer_bob(world, self.get_position())
 
         case = get_Case(listeCases, pos_i, pos_j)
-        case.gerer_propriete()
+        case.gerer_propriete(interface)
         ajouter(world, "bob",self, pos_i, pos_j)
 
 
-    def move_to_destination(self, world, destination,listeCases):
+    def move_to_destination(self, world, destination,listeCases, interface):
         x, y=destination.get_position() 
         self.effacer_bob(world, (self.x, self.y))
         copieX=self.x
@@ -303,11 +304,11 @@ class Bob():
             self.x, self.y = self.choisirPositionMemoire(position_possibles)
 
         case = get_Case(listeCases, self.x, self.y)
-        case.gerer_propriete()
+        case.gerer_propriete(interface)
         ajouter(world, "bob",self, self.x, self.y)
        
 
-    def move_away(self, detected_bob, world, nb_lignes, nb_collones,listeCases):
+    def move_away(self, detected_bob, world, nb_lignes, nb_collones,listeCases,interface):
         self.effacer_bob(world, (self.x, self.y))
         copieX=self.x
         copieY=self.y
@@ -325,7 +326,7 @@ class Bob():
         
         self.x, self.y = self.choisirPositionMemoire(position_possibles)
         case = get_Case(listeCases, self.x, self.y)
-        case.gerer_propriete()
+        case.gerer_propriete(interface)
         ajouter(world, "bob",self, self.x, self.y)
 
 
@@ -377,7 +378,7 @@ class Bob():
                     break
 
 
-    def move(self, world, nb_lignes, nb_collones,listeCases):#mouvement a une case adjacente 
+    def move(self, world, nb_lignes, nb_collones,listeCases,interface):#mouvement a une case adjacente 
         ancienX =self.x
         ancienY =self.y #pour stocker cette position dans la liste des cases à memorisées 
         nourritures_visibles, _= self.objets_visibles(world)
@@ -394,21 +395,21 @@ class Bob():
         else:
             if destination==None:
              
-                self.move_alea(world, nb_lignes, nb_collones,listeCases)
+                self.move_alea(world, nb_lignes, nb_collones,listeCases,interface)
 
             else:
-                self.move_to_destination(world, destination,listeCases)
+                self.move_to_destination(world, destination,listeCases,interface)
 
         self.memoriserLesNourritures(world,destination,nourritures_visibles)#on memorise les nourritures qu'on ne voit plus  
         self.memoriserCaseVisite(ancienX,ancienY)# apres avoir effectuer le deplacement vers une case on memorise la position precedente 
-      
 
 
-    def deplacementParTick(self,world, position, nb_lignes, nb_collones, reproduction_parthenogenese_active, reproduction_sexuelle_active, age_active,listeCases):
+
+    def deplacementParTick(self,world, position, nb_lignes, nb_collones, reproduction_parthenogenese_active, reproduction_sexuelle_active, age_active,listeCases,interface):
         
         for _ in range(int(self.get_velocity())):
             
-            self.move(world, nb_lignes, nb_collones,listeCases)
+            self.move(world, nb_lignes, nb_collones,listeCases,interface)
             
             if (self.consommation(world, (self.x, self.y)) ):
                 if reproduction_sexuelle_active:
