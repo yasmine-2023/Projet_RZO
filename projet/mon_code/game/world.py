@@ -63,7 +63,7 @@ class World:
 
 #################
     def dessiner_nourriture_adversaire(self, i ,j, fenetre, camera_x, camera_y, zoom):  
-        img_nourriture_z=pg.transform.scale(self.img_nourriture_adv, ((self.img_nourriture.get_width()*zoom), (self.img_nourriture.get_height()*zoom)))   
+        img_nourriture_z=pg.transform.scale(self.img_nourriture_adv, ((self.img_nourriture_adv.get_width()*zoom), (self.img_nourriture_adv.get_height()*zoom)))   
         img_tuile_z=pg.transform.scale(self.img_tuile, ((self.img_tuile.get_width()*zoom), (self.img_tuile.get_height()*zoom)))
         x,y=self.calculer_x_y(i,j)
         fenetre.blit(img_nourriture_z, 

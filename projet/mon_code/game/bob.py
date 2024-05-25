@@ -160,6 +160,8 @@ class Bob():
                         nourritures_visibles.append(world[(neighbor_x, neighbor_y)]['nourriture'])
                     else:
                         bobs_visibles.extend(world[(neighbor_x, neighbor_y)]['bob'])
+        ####" ajout des nourritures adverses"
+        
                         
         
         return nourritures_visibles, bobs_visibles

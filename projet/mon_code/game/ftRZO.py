@@ -359,7 +359,8 @@ class Interface:
 
 #A coder PS:utiliser la ft get_postions_mesNourritures() de la classe jeu
     def get_nourriture_adverssaire(self):
-        pass
+        return [[1,1]]
+        
 
 
 

@@ -142,11 +142,7 @@ class Jeu():
                 #print("case impossible !!!!!!!!!!!!!!!")
                 self.genere_objet(option)  
     
-    
 
-    
-    
-    
     def effacer_nourriture(self):
         dict_copy = dict(self.world)
         for pos in dict_copy.keys():
