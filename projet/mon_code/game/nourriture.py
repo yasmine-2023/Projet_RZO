@@ -44,14 +44,18 @@ class Nourriture():
             return self.energie_nourriture == other.energie_nourriture and self.x==other.x and self.y ==other.y
         return False
     
-    def abandonner_propriete(self,jeu):
+    def abandonner_propriete_nourriture(self,jeu):
         self.proprietaire=0
         jeu.get_mon_joueur().effacer_nourriture(self)
         self.effacer_nourriture(jeu.world, (self.x, self.y))
+        jeu.nourritures_adverssaires.append(self)
+
+        
 
     def prendre_propriete(self,jeu):
         jeu.get_mon_joueur().ajouter_nourriture_joueur(self)
         jeu.wold[(self.x, self.y)]["nourriture"]=self
+        jeu.nourritures_adverssaires.remove(self)
 
 
 

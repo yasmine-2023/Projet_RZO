@@ -35,7 +35,7 @@ class Jeu():
        
         self.world = {}
         self.listeCases=[]
-
+        self.nourritures_adverssaires = []
          #le joueur qui execute ce programme
         self.initialiser_case()
         self.interface = Interface(self)
@@ -44,7 +44,6 @@ class Jeu():
         self.idjoueur =self.interface.get_mon_id()
         self.genere_objet("bob")
         self.genere_nourriture()
-
     def get_mon_interface(self):
         return self.interface
        
@@ -132,12 +131,7 @@ class Jeu():
             #     new_objet= Nourriture()
                 ajouter(self.world,option,new_objet,pos_i,pos_j)
                 joueur.ajouter_bob_au_joueur(new_objet)
-                case.prendre_propriete(self)
-
-
-                
-                
-
+                case.prendre_propriete(self)   
             else:
                 #print("case impossible !!!!!!!!!!!!!!!")
                 self.genere_objet(option)  
@@ -177,8 +171,15 @@ class Jeu():
                 self.genere_nourriture()
                 
             
-            
-        
+    def generer_nourriture_adverssaire(self):
+        position=self.interface.get_nourriture_adverssaire()
+        for i in range(len(position)):
+            pos_i=position[i][0]
+            pos_j=position[i][1]
+            new_objet= Nourriture()
+            new_objet.set_position(pos_i,pos_j)
+            self.nourritures_adverssaires.append(new_objet)
+     
     def get_tick(self):
         return self.cpt_ticks
     def get_jour(self):
@@ -215,6 +216,8 @@ class Jeu():
             if "nourriture" in elmts:
                 liste_nourriture.append([case[0], case[1]])
         return liste_nourriture
+    
+    
        
     
         
