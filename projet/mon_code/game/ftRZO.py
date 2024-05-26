@@ -48,14 +48,17 @@ class Interface:
         self.library_path = './mon_code/game/projet_envoi/libprojetReseau.so'
         self.loading = False
         self.listUsers = create_list(MAX_JOUEUR)
+        self.send_list = [] #Liste des messages à envoyer
         self.messages_list = []  # Liste pour stocker les messages reçus
         self.message_lock = threading.Lock()  
+        self.send_lock = threading.Lock()
         self.stop_event = Event()
         self.info_adversaire = {}
         self.var_id_libre_ad = 1
         self.test_id = None
         self.demande_etat_case=-1
         self.autre_joueur_a_la_case=0
+        self.lib = self.load_library()
 
     def load_library(self):
         lib = CDLL(self.library_path)
@@ -71,24 +74,33 @@ class Interface:
     '''--------------------------------------------Fonction C lien--------------------------------------------------'''
 
     def send_message(self, message):
-        lib = self.load_library()
+        print("je vais mettre le message sur la liste:",message)
+        self.send_list.append(message)
+        print("j'ai mis le message sur la liste:",message)
+
+    def faire_envoi(self, message):
+        
         message_c = ctypes.create_string_buffer(message.encode('utf-8'))
-        lib.envoi(message_c)
+        self.lib.envoi(message_c)
+        print(message_c, " a ete envoye par la fonction c")
 
 
     def receive_message(self):
-        lib = self.load_library()
-        message_ptr = lib.reception()
+        message_ptr = self.lib.reception()
+
         if message_ptr:
             mess = ctypes.c_char_p(message_ptr).value.decode('utf-8')
             
             with self.message_lock:
                 self.messages_list.append(mess)
+                print("je met le message sur la liste d'attente :",mess)
+                print("voici la liste actuel :", self.messages_list)
             
 
 
 
     def boucle_ecoute(self):
+        
         while not self.stop_event.is_set():
 
             self.receive_message()
@@ -101,25 +113,44 @@ class Interface:
                 with self.message_lock:
                     while self.messages_list:
                         message = self.messages_list.pop(0)
-                        self.analyse_message(message)
-            time.sleep(0.1)
+                        print("je vais lance l'analyse du message:",message)
+                        thread = Thread(target=self.analyse_message, args=(message,))
+                        thread.start()
+            time.sleep(0.01)
 
+    def boucle_envoi(self):
+        while not self.stop_event.is_set():
+
+            if self.send_list:
+                with self.send_lock:
+                    while self.send_list:
+                        
+                        a_envoye = self.send_list.pop(0)
+                        print("je recupere le message a envoye de la liste :",a_envoye)
+                        self.faire_envoi(a_envoye)
+                        print("j'ai fais l'envoie du message:", a_envoye)
+                        
+            time.sleep(0.01)
+        
     '''-------------------------------------------demarage et stopage du jeu---------------------------------------------------'''
     
     def start_game(self) : 
+        
         self.start1 = Thread(target=self.boucle_ecoute)
         self.start2 = Thread(target=self.boucle_analyse)
+        self.start3 = Thread(target=self.boucle_envoi)
         self.start1.start()
         self.start2.start()
+        self.start3.start()
         
 
     def stop_game(self):
-        lib = self.load_library()
 
         self.stop_event.set()
 
         self.start1.join()
         self.start2.join()
+        self.start3.join()
         
     '''---------------------------------------------utilitiare liste des connectés------------------------------------------------'''
         
@@ -152,6 +183,7 @@ class Interface:
 
 
     def analyse_protocol(self,dico):
+        print("janalyse le protocol pour :",dico)
         for cle in dico:
             match cle:
                 case "n":
@@ -159,6 +191,7 @@ class Interface:
                 case "r":
                     self.DeconnexionUtilisateur(dico[cle])
                 case "k":
+                    print("ça rentre dans le match case pour k")
                     self.analyse_info_adversaire(dico[cle])
                 case "u" :
                     self.analyse_id_libre_ad(dico[cle])
@@ -176,8 +209,11 @@ class Interface:
 
 
     def analyse_message(self,message):
+        print("je suis rentre dans l'analyse du message:",message)
         dico=self.decoupe(message)
+        print("j'ai bien decoupe mon message:",message)
         self.analyse_protocol(dico)
+        
         
     '''---------------------------------------- Fonction pour le jeu en lui-même ------------------------------------------------------'''
 
@@ -230,7 +266,7 @@ class Interface:
         i = 0
         while i<10 :
             if self.var_id_libre_ad == 0:
-                print ("la var est passe a 0")
+                #print ("la var est passe a 0")
                 self.var_id_libre_ad = 1
                 return 0
             i+=1
@@ -239,15 +275,15 @@ class Interface:
 
 
     def analyse_id_libre_ad(self, tab):
-        print("je rentre dans analyse_id,"+str(tab[0])+","+str(self.idjoueur))
+        #print("je rentre dans analyse_id,"+str(tab[0])+","+str(self.idjoueur))
         if self.idjoueur == int(tab[0]):
-            print("je vais envoye la rep a cedric:")
+            #print("je vais envoye la rep a cedric:")
             self.send_message("p,"+str(self.idjoueur))
 
     def analyse_rep_id_libre_ad(self,tab):
-        print("je rentre dans analyse_rep_id"+str(tab[0]))
+        #print("je rentre dans analyse_rep_id"+str(tab[0]))
         if self.test_id == int(tab[0]):
-            print("je suis rentre dans le if de analyse rep")
+            #print("je suis rentre dans le if de analyse rep")
             self.connexionUtilisateur(tab)
             self.var_id_libre_ad = 0
 
@@ -270,13 +306,14 @@ class Interface:
 
 
     def give_info(self):
+        print("je donne mes information à ced")
         self.send_message("k,"+str(self.idjoueur)+","+str(self.jeu.mesBobs()))
             
 
 
     
     def analyse_info_adversaire(self,tab):
-        mon_id = self.get_mon_id()
+        mon_id = self.idjoueur
         id_user = int(tab[0])
 
         if( mon_id != id_user):
@@ -284,26 +321,31 @@ class Interface:
             str_list = ','.join(ma_tab)
             actual_list = ast.literal_eval(str_list)
             self.info_adversaire[id_user] = actual_list
+            print("liste des bobs de ced bien mis a jour:", actual_list)
 
     def get_info_adversaire(self):
         valeurs_collees = []
         for liste in self.info_adversaire.values():
             valeurs_collees.extend(liste)
+        print("la valeur des bobs de ced retorune est :",valeurs_collees)
         return valeurs_collees
     
     '''------------------------------------------------------'''
     
     def autre_joueur_abandonne_propriete(self,x,y):
         self.send_message("j,"+str(self.idjoueur)+","+str(x)+","+str(y))
-        print("j'ai envoye une demande de propriete")
+        #print("le joueur d'id :"+str(self.idjoueur)+", a envoye une demande d'abandon de propriete pour la case :"+str(x)+","+str(y))
         i = 0
         while i<10 :
             if self.demande_etat_case != -1:
                 t = self.demande_etat_case
                 self.demande_etat_case = -1
+                #print(" reponse à la demande abandon de propriete d'id:"+str(self.idjoueur)+", et de coordonnées de case :"+str(x)+","+str(y))
                 return t
             i+=1
+            self.send_message("j,"+str(self.idjoueur)+","+str(x)+","+str(y))
             time.sleep(0.02)
+        #print("le joueur d'id :"+str(self.idjoueur)+", na pas eu de reponse de l'abandon pour la case :"+str(x)+","+str(y))
         return -1
 
 
@@ -314,7 +356,9 @@ class Interface:
             x = int(tab[1])
             y = int(tab[2])
             case = get_Case(self.jeu.listeCases,x,y)
-            print("j'analyse la demande de propriete de cedric")
+            #print("j'analyse la demande du joueur d'id :"+str(id_envoyeur) +", pour que j'abandonne la case de coordonnées: "+str(x)+","+str(y))
+            #r=case.je_possede_propriete()
+            #print("possession de la case :"+str(x)+","+str(y)+"; est :"+ str(r))
             if case.je_possede_propriete() :
                 case.abandonner_propriete(self.jeu)
                 val = self.jeu.check_nourriture_existe(x,y)
@@ -323,7 +367,7 @@ class Interface:
 
     def analyse_rep_autre_joueur_abandonne_propriete(self,tab):
         if int(tab[0]) == self.idjoueur:
-            print("j'ai recus la rep de la demande de propriete")
+            #print("j'ai recus la rep de la demande d'abandon de propriete")
             self.demande_etat_case = int(tab[1])
 
 
@@ -331,14 +375,18 @@ class Interface:
     '''------------------------------------------------------'''
     def autre_Joueur_Possede_Case(self, x, y) :
         self.send_message("v,"+str(self.idjoueur)+","+str(x)+","+str(y))
-        print("j'ai envoye une demande de possession de case")
+        #print("le joueur d'id :"+str(self.idjoueur)+", a envoye une demande pour savoir qui possede la case :"+str(x)+","+str(y))
         i = 0
         while i<10 :
             if self.autre_joueur_a_la_case == 1:
                 self.autre_joueur_a_la_case = 0
+                #print("le joueur d'id :"+str(self.idjoueur)+", a recus une reponse qu'un autre joueur possede la case :"+str(x)+","+str(y))
+        
                 return 1
             i+=1
             time.sleep(0.02)
+        #print("le joueur d'id :"+str(self.idjoueur)+", n'a pas recus de reponse pour savoir si un autre joueur possede la case :"+str(x)+","+str(y))
+        
         return 0
 
 
@@ -348,82 +396,18 @@ class Interface:
             x = int(tab[1])
             y = int(tab[2])
             case = get_Case(self.jeu.listeCases,x,y)
-            print("j'analyse la demande de propriete de cedric")
+            #print("j'analyse la demande du joueur d'id :"+str(id_envoyeur) +", pour savoir si je possede la case de coordonnées: "+str(x)+","+str(y))
+            #r=case.je_possede_propriete()
+            #print("possession de la case :"+str(x)+","+str(y)+"; est :"+ str(r))
             if case.je_possede_propriete() :
                 self.send_message("w,"+str(id_envoyeur)+","+str(1))
 
     def analyse_rep_autre_Joueur_Possede_Case(self,tab):
         if int(tab[0]) == self.idjoueur:
-            print("j'ai recus la rep de la demande de propriete")
+            #print("j'ai recus la rep de la demande de propriete")
             self.autre_joueur_a_la_case = int(tab[1])
+
 
 #A coder PS:utiliser la ft get_postions_mesNourritures() de la classe jeu
     def get_nourriture_adverssaire(self):
         return [[1,1]]
-        
-
-
-
-    
-
-
-
-
-
-
-
-
-
-'''----------------------------------------------------------------------------------------------------------'''
-'''------------------------------------------- Notre Main ---------------------------------------------------'''
-'''----------------------------------------------------------------------------------------------------------'''
-
-
-
-if __name__ == "__main__":
-
-    '''----------------------- Bonjour ----------------------------'''
-
-    interface = Interface()
-    interface.start_game()
-    time.sleep(1)
-
-    '''------------------------------------------------------------'''
-    
-
-    mon_id = interface.create_id()
-    print("c'est mon id:"+str(mon_id))
-
-    time.sleep(0.1)
-
-    mo = interface.create_id()
-    print("c'est mon 2eme id:"+str(mo))
-    
-    time.sleep(0.1)
-    ''''
-    mon = interface.create_id()
-    print("c'est mon 3eme id:"+str(mon))
-    time.sleep(1)
-    
-    time.sleep(0.07)
-
-    print("j'ai combien dutilisateur :"+str(interface.nb_users()))
-
-    time.sleep(0.07)
-
-    interface.JmeDeConnecte(mo)
-    '''''
-
-    rep = interface.get_info_adversaire(mon_id)
-    
-    print(rep)
-    
-
-
-
-    '''----------------------- Au revoir ----------------------------'''
-
-    time.sleep(0.1)
-    interface.stop_game()
-
-    '''------------------------------------------------------------'''
