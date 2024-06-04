@@ -5,6 +5,7 @@ La classe `Nourriture` représente un objet de nourriture dans le jeu.
 """
 ########################################################
 from game.ftRZO import *
+from game.methods import * 
 num_nourriture=0
     
 class Nourriture():
@@ -14,10 +15,9 @@ class Nourriture():
         global num_nourriture
         self.id=num_nourriture
         num_nourriture+=1
- 
         self.x=0
         self.y=0
-        self.proprietaire=1
+        self.proprietaire=0 #remis a 1 quand  je genere ma propre nourriture dans jeu
     @classmethod
     def set_parametres(cls,energy_food, **d):
         cls.dflt_energy_nourriture=float(energy_food)
@@ -46,16 +46,24 @@ class Nourriture():
     
     def abandonner_propriete_nourriture(self,jeu):
         self.proprietaire=0
-        jeu.get_mon_joueur().effacer_nourriture(self)
+        jeu.get_mon_joueur().effacer_nourriture_joueur(self)
         self.effacer_nourriture(jeu.world, (self.x, self.y))
-        jeu.nourritures_adverssaires.append(self)
-
-        
 
     def prendre_propriete(self,jeu):
+        self.proprietaire=1
         jeu.get_mon_joueur().ajouter_nourriture_joueur(self)
-        jeu.wold[(self.x, self.y)]["nourriture"]=self
-        jeu.nourritures_adverssaires.remove(self)
+        if (self.x, self.y) not in jeu.world:
+            jeu.world[(self.x, self.y)] = {}
+       
+        # Ajoute ou met à jour la clé "nourriture" dans le dictionnaire à la position (self.x, self.y)
+        if "nourriture" not in jeu.world[(self.x, self.y)]:
+            jeu.world[(self.x, self.y)]["nourriture"] = None
+       
+        jeu.world[(self.x, self.y)]["nourriture"] = self
+        print("Je mets à jour mon dictionnaire, je rajoute la nourriture :", jeu.world[(self.x, self.y)]["nourriture"])
+
+
+
 
 
 

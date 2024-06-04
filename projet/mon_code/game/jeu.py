@@ -12,7 +12,6 @@ from game.case import *
 from game.ftRZO import Interface
 #from game.traitement import *
 eat_bob=0
-
 x_start=30 
 y_start=30
 #global idjoueur 
@@ -32,10 +31,10 @@ class Jeu():
         self.reproduction_parthenogenese_activation=reproduction_parthenogenese_activation
         self.reproduction_sexuelle_activation=reproduction_sexuelle_activation
         self.age_active=age
-       
+        self.nourriture_créé = 0
+        self.bob_créé = 0
         self.world = {}
         self.listeCases=[]
-        self.nourritures_adverssaires = []
          #le joueur qui execute ce programme
         self.initialiser_case()
         self.interface = Interface(self)
@@ -44,6 +43,8 @@ class Jeu():
         self.idjoueur =self.interface.get_mon_id()
         self.genere_objet("bob")
         self.genere_nourriture()
+
+                 
     def get_mon_interface(self):
         return self.interface
        
@@ -99,7 +100,7 @@ class Jeu():
                 for bob in list(elmts["bob"]):
                     if not bob.deja_deplace:
                         if not bob.est_mort:
-                            bob.deplacementParTick(self.world, case, self.world_x,self.world_y, self.reproduction_parthenogenese_activation, self.reproduction_sexuelle_activation, self.age_active,self.listeCases,self.interface)
+                            bob.deplacementParTick(self.world, case, self.world_x,self.world_y, self.reproduction_parthenogenese_activation, self.reproduction_sexuelle_activation, self.age_active,self.listeCases,self.interface )
                             if self.age_active:    
                                 bob.increment_age()
                             if bob.eSpawn<=0:
@@ -112,6 +113,7 @@ class Jeu():
                     if bob.est_mort:
                         bob.effacer_bob(self.world,case)
         self.interface.give_info()
+        self.interface.give_info_nourriture()
  
     def genere_objet(self,option):
         joueur = self.get_mon_joueur() # joueur = joueur1
@@ -119,14 +121,18 @@ class Jeu():
             nb_objet=self.nb_bobs 
         # elif option=="nourriture":
         #     nb_objet=self.totale_nourriture
-            
-        for _ in range(nb_objet):
+        i = 0
+        while self.bob_créé < nb_objet : 
+        #for i in range(nb_objet):
             pos_i = random.randint(0, self.world_x - 1)
             pos_j = random.randint(0, self.world_y - 1)
             case = get_Case(self.listeCases,pos_i,pos_j)
-            if (case is not None and( case.je_possede_propriete()==True or self.interface.autre_Joueur_Possede_Case(pos_i,pos_j) == False)):
+            i+=1
+            print("mon nombre de bob créé est",self.nourriture_créé,"sur les :",self.totale_nourriture,"j'en suis a mon iteration numero:",i)
+            if (case is not None and( case.je_possede_propriete()==True or self.interface.autre_Joueur_Possede_Case(pos_i,pos_j) == 0)):
                 if option=="bob":
                     new_objet = Bob() 
+                    self.bob_créé+=1
                 # if option=="nourriture":
             #     new_objet= Nourriture()
                 ajouter(self.world,option,new_objet,pos_i,pos_j)
@@ -135,7 +141,7 @@ class Jeu():
             else:
                 #print("case impossible !!!!!!!!!!!!!!!")
                 self.genere_objet(option)  
-    
+        self.bob_créé = 0
 
     def effacer_nourriture(self):
         dict_copy = dict(self.world)
@@ -147,14 +153,20 @@ class Jeu():
 
     def genere_nourriture(self):
         joueur = self.get_mon_joueur()
-        for _ in range(self.totale_nourriture):
+        i=0
+        while self.nourriture_créé < self.totale_nourriture:
             pos_i = random.randint(0, self.world_x - 1)
             pos_j = random.randint(0, self.world_y - 1)
             case = get_Case(self.listeCases,pos_i,pos_j)
-            if( case is not None and (case.je_possede_propriete()==True or self.interface.autre_Joueur_Possede_Case(pos_i,pos_j) == False)):
+            i+=1
+            print("mon nombre de nourriture créé est",self.nourriture_créé,"sur les :",self.totale_nourriture,"j'en suis a mon iteration numero:",i)
+            if( case is not None ):
+               if case.je_possede_propriete() or self.interface.autre_Joueur_Possede_Case(pos_i,pos_j) == 0:
                 new_objet= Nourriture()
                 new_objet.x=pos_i
                 new_objet.y=pos_j
+                new_objet.proprietaire=1
+                self.nourriture_créé+=1
                 if (pos_i, pos_j) in self.world:
                     if "nourriture" in self.world[pos_i, pos_j]:
                         self.world[pos_i, pos_j]["nourriture"].set_energie((self.world[pos_i, pos_j]["nourriture"].get_energie() + new_objet.get_energie())) 
@@ -169,16 +181,9 @@ class Jeu():
             else:
                 
                 self.genere_nourriture()
+
+        self.nourriture_créé = 0
                 
-            
-    def generer_nourriture_adverssaire(self):
-        position=self.interface.get_nourriture_adverssaire()
-        for i in range(len(position)):
-            pos_i=position[i][0]
-            pos_j=position[i][1]
-            new_objet= Nourriture()
-            new_objet.set_position(pos_i,pos_j)
-            self.nourritures_adverssaires.append(new_objet)
      
     def get_tick(self):
         return self.cpt_ticks
@@ -193,7 +198,7 @@ class Jeu():
                 case = Case(i, j)
                 self.listeCases.append(case)
 
-    def mesBobs(self): # retourne une liste de liste [[x,y,masse], [x,y,masse], ...]
+    def mesBobs(self): 
         liste_bobs = []
         for case, elmts in self.world.items():
             if "bob" in elmts:
@@ -204,19 +209,34 @@ class Jeu():
     #retourne l'energie de la nouriture si elle existe sinon 0    
     def check_nourriture_existe(self, x, y):
         if (x, y) in self.world:
+            print("j'ai trouvé une nourriture dans la case")
             if "nourriture" in self.world[x, y]:
+                print("La ft check nourriture existe retourne ", self.world[x, y]["nourriture"].get_energie())
                 return self.world[x, y]["nourriture"].get_energie()
         return 0 
-    
+
 
 #retourne la liste des positions des nourritures
-    def get_postions_mesNourritures(self):
+    def get_positions_mesNourritures(self):
         liste_nourriture = []
         for case, elmts in self.world.items():
             if "nourriture" in elmts:
                 liste_nourriture.append([case[0], case[1]])
         return liste_nourriture
+
+
+    def get_nourriture(self, x, y):
+            if (x, y) in self.world:
+                if "nourriture" in self.world[x, y]:
+                    return self.world[x, y]["nourriture"]
+            return None
+        
+
+
+
+
     
+
     
        
     

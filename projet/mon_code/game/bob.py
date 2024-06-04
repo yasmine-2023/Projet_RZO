@@ -142,7 +142,15 @@ class Bob():
         self.proprietaire = 0
 
 
-    def objets_visibles(self, world):
+    def objets_visibles(self, world,interface):
+        nourrituresAdv=[]
+        positions=interface.get_nourritures_adverssaires()
+        for i in range(len(positions)):
+            pos_i=positions[i][0]
+            pos_j=positions[i][1]
+            new_objet= Nourriture()
+            new_objet.set_position(pos_i,pos_j)
+            nourrituresAdv.append(new_objet)
         # Clear previous perceptions
         nourritures_visibles = []
         bobs_visibles = []
@@ -155,14 +163,18 @@ class Bob():
                 neighbor_y = bob_j + dy
 
                 distance = abs(dx) + abs(dy)
-                if distance <= max_distance and (neighbor_x, neighbor_y) in world:
-                    if "nourriture" in world[(neighbor_x, neighbor_y)] :   
-                        nourritures_visibles.append(world[(neighbor_x, neighbor_y)]['nourriture'])
-                    else:
-                        bobs_visibles.extend(world[(neighbor_x, neighbor_y)]['bob'])
-        ####" ajout des nourritures adverses"
-        
-                        
+                if distance <= max_distance:
+                    if (neighbor_x, neighbor_y) in world:
+                        if "nourriture" in world[(neighbor_x, neighbor_y)] :   
+                            nourritures_visibles.append(world[(neighbor_x, neighbor_y)]['nourriture'])
+                        else:
+                            if "bob" in world[(neighbor_x, neighbor_y)] :
+                                bobs_visibles.extend(world[(neighbor_x, neighbor_y)]['bob'])
+
+                    for nourriture in nourrituresAdv:
+                        if (neighbor_x, neighbor_y)==nourriture.get_position():
+                            nourritures_visibles.append(nourriture)
+              
         
         return nourritures_visibles, bobs_visibles
     
@@ -191,9 +203,9 @@ class Bob():
         return res
 
 
-    def preciserDestinationNouriture(self,world):
+    def preciserDestinationNouriture(self,world,interface):
         destination=None
-        nourritures_visibles, bobs_visibles = self.objets_visibles(world)
+        nourritures_visibles, bobs_visibles = self.objets_visibles(world,interface)
         #print("Nourritures visibles pour", self, ":", end=" ")
         for e in nourritures_visibles:
             print(e, end=" ")
@@ -227,10 +239,10 @@ class Bob():
         return destination   
 
 
-    def predateurTrouvePerception(self,world, destination):
+    def predateurTrouvePerception(self,world, destination,interface):
         pretadeur_trouve=False
         # destination =  self.preciserDestinationNouriture(world)
-        _, bobs_visibles= self.objets_visibles(world)
+        _, bobs_visibles= self.objets_visibles(world,interface)
         lp=[b for b in bobs_visibles if b.is_predator(self) and b!=self]
      
         for b_pretador in (lp):
@@ -345,8 +357,8 @@ class Bob():
                     self.casesMemorisees.append((ancienX,ancienY)) #et on stocke la position de la case qu'on vient de visiter 
 
 
-    def nourritures_plus_visibles(self,world,destination,anciennes_nourritures_visibles):#retourne les nourriture qu'on ne voit plus
-        nouvelles_nourritures_visibles, _= self.objets_visibles(world)
+    def nourritures_plus_visibles(self,world,destination,anciennes_nourritures_visibles,interface):#retourne les nourriture qu'on ne voit plus
+        nouvelles_nourritures_visibles, _= self.objets_visibles(world,interface)
         if anciennes_nourritures_visibles:
             if destination in anciennes_nourritures_visibles:
                 anciennes_nourritures_visibles.remove(destination)
@@ -365,9 +377,9 @@ class Bob():
                 self.casesMemorisees.pop(0)
 
 
-    def memoriserLesNourritures(self,world,destination,anciennes_nourritures_visibles):# procedure qui permet de memoriser l ensemble de nourriture qu on ne voit plus en fonction de leur energie et du points restants 
+    def memoriserLesNourritures(self,world,destination,anciennes_nourritures_visibles,interface):# procedure qui permet de memoriser l ensemble de nourriture qu on ne voit plus en fonction de leur energie et du points restants 
       
-        nourritures_plus_visibles= self.nourritures_plus_visibles(world,destination,anciennes_nourritures_visibles)
+        nourritures_plus_visibles= self.nourritures_plus_visibles(world,destination,anciennes_nourritures_visibles,interface)
        
         nourriture_A_memorise=sorted(nourritures_plus_visibles, key=lambda food: food.get_energie(), reverse=True)
        
@@ -383,10 +395,10 @@ class Bob():
     def move(self, world, nb_lignes, nb_collones,listeCases,interface):#mouvement a une case adjacente 
         ancienX =self.x
         ancienY =self.y #pour stocker cette position dans la liste des cases à memorisées 
-        nourritures_visibles, _= self.objets_visibles(world)
+        nourritures_visibles, _= self.objets_visibles(world,interface)
         
-        destination =  self.preciserDestinationNouriture(world)
-        predateur_trouve,lp=self.predateurTrouvePerception(world, destination)
+        destination =  self.preciserDestinationNouriture(world,interface)
+        predateur_trouve,lp=self.predateurTrouvePerception(world, destination,interface)
        
         if predateur_trouve:
             
@@ -402,7 +414,7 @@ class Bob():
             else:
                 self.move_to_destination(world, destination,listeCases,interface)
 
-        self.memoriserLesNourritures(world,destination,nourritures_visibles)#on memorise les nourritures qu'on ne voit plus  
+        self.memoriserLesNourritures(world,destination,nourritures_visibles,interface)#on memorise les nourritures qu'on ne voit plus  
         self.memoriserCaseVisite(ancienX,ancienY)# apres avoir effectuer le deplacement vers une case on memorise la position precedente 
 
 
@@ -540,7 +552,7 @@ class Bob():
             self.eat_food(world, nourriture_max)
             if nourriture_max.get_energie()<=0:
                 nourriture_max.effacer_nourriture(world, position)
-            
+            print("La nourriture est consommé")
             return True
         else:
             bobs=list(world[position]["bob"])

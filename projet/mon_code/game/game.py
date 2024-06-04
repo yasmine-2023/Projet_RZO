@@ -139,7 +139,7 @@ class Game:
         
         while self.playing:
             next=self.events() # pour quitter
-            self.clock.tick(60) # nombre de FPS
+            self.clock.tick(40) # nombre de FPS
             self.update() # pour initialiser
 
             current_time = pg.time.get_ticks()
@@ -204,15 +204,15 @@ class Game:
 
         self.nb_bob, self.nb_food = n_bob, n_food
         liste_info_bob= self.interface.get_info_adversaire()
-        time.sleep(0.1)
-        print("info bob adverssaires",liste_info_bob)
+        
+        #print("info bob adverssaires",liste_info_bob)
         for info in liste_info_bob:
             x,y,masse=info
             self.world.dessiner_bob_adversaire(x, y, self.screen, self.camera.mouvement.x, self.camera.mouvement.y, self.camera.zoom, masse, 0, 0)
         
-        liste_info_nourriture= self.interface.get_nourriture_adverssaire()
-        print("info nourriture adverssaires",liste_info_nourriture)
-        time.sleep(0.1)
+        liste_info_nourriture= self.interface.get_nourritures_adverssaires()
+        #print("info nourriture adverssaires",liste_info_nourriture)
+        
         if(liste_info_nourriture):
             for info2 in liste_info_nourriture:
                 x,y=info2

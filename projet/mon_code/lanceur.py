@@ -33,7 +33,7 @@ class Lanceur():
         self.active_option = None
         self.input_value = ""
         
-        self.default_options={'N': '10', 'M': '10', 'ticks_day': '100', 'energy_food': '100', 'foods_jour': '5', 'nb_bobs': '3', 'eSpawn': '100', 'eMax': '200', 'eMother': '150', 'eBirth': '50',"e_SR":'150',"eBirth_SR":"100", 'Mutv': '0.1', 'Mut_m': '0.1', 'Mut_p': '1', 'Mut_mem': '1', 'velocity': '1', 'mass': '1', 'perception_score': '0', 'initial_memory_points': '0', 'reproduction_parthenogenese_activation': True, "age":False, "reproduction_sexuelle_activation":False}
+        self.default_options={'N': '5', 'M': '5', 'ticks_day': '100', 'energy_food': '100', 'foods_jour': '5', 'nb_bobs': '1', 'eSpawn': '100', 'eMax': '200', 'eMother': '150', 'eBirth': '50',"e_SR":'150',"eBirth_SR":"100", 'Mutv': '0.1', 'Mut_m': '0.1', 'Mut_p': '1', 'Mut_mem': '1', 'velocity': '0', 'mass': '1', 'perception_score': '6', 'initial_memory_points': '0', 'reproduction_parthenogenese_activation': True, "age":False, "reproduction_sexuelle_activation":False}
         self.labels_formulaire=[[("N","Height"), ("M", "Width"), ("ticks_day", "Ticks per day")], [("energy_food", "Energy per food"),("foods_jour", "Number of Food per day"), ("nb_bobs", "Initial Bob number")], [("eSpawn", "Initial energy of Bob"), ("eMax", "Maximum energy of bob"), ("eMother", "Energy lost by the mother"),("e_SR", "Energie for SR"), ("eBirth", "Initial energy of Birth"),("eBirth_SR", "Initial energy of Birth SR")], [("Mutv", "Mutation rate for velocity"), ("Mut_m", "mutation rate for mass"), ("Mut_p", "mutation rate for perception"), ("Mut_mem", "mutation rate for memory")], [("velocity", "Initial velocity"), ("mass", "Initial mass"), ("perception_score", "Initial perception score"), ("initial_memory_points", "initial memory points")]]
         self.labels_formulaire_pause=[[("N","Height"), ("M", "Width"), ("ticks_day", "Ticks per day")], [("energy_food", "Energy per food"),("foods_jour", "Number of Food per day")], [("eSpawn", "Initial energy of Bob"), ("eMax", "Maximum energy of bob"), ("eMother", "Energy lost by the mother"),("e_SR", "Energie for SR"), ("eBirth", "Initial energy of Birth"),("eBirth_SR", "Initial energy of Birth SR")], [("Mutv", "Mutation rate for velocity"), ("Mut_m", "mutation rate for mass"), ("Mut_p", "mutation rate for perception"), ("Mut_mem", "mutation rate for memory")], [("velocity", "Initial velocity"), ("mass", "Initial mass"), ("perception_score", "Initial perception score"), ("initial_memory_points", "initial memory points")]]
         self.options=self.default_options
@@ -273,5 +273,3 @@ class Lanceur():
 
 Lanceur()
 
-
-  
