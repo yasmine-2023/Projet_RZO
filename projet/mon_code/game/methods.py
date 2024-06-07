@@ -149,7 +149,27 @@ def get_Case(listeCase,x,y):
    
 
 
+   
+def nombreBobCase(x,y,world,listeinfoBob):
+    nb = 0
+    for element in listeinfoBob:
+        x1,y1,_=element
+        if x1==x and y1 == y:
+            nb = nb +1
+    if (x,y) in world and "bob" in world[(x,y)]:
+            nb = nb + len (world[(x,y)]["bob"])
+    return nb
 
+def dict_bob_adv(liste_bob_adv):
+    dict_bob = {}
+    for bob in liste_bob_adv:
+        x, y, masse = bob
+        key = (x, y)
+        if key in dict_bob:
+            dict_bob[key].append(masse)
+        else:
+            dict_bob[key] = [masse]
+    return dict_bob
     
 
    

@@ -206,10 +206,13 @@ class Game:
         liste_info_bob= self.interface.get_info_adversaire()
         
         #print("info bob adverssaires",liste_info_bob)
-        for info in liste_info_bob:
-            x,y,masse=info
-            
-            self.world.dessiner_bob_adversaire(x, y, self.screen, self.camera.mouvement.x, self.camera.mouvement.y, self.camera.zoom, masse, 0, 0)
+        dict =dict_bob_adv(liste_info_bob)
+        for case,masse in dict:
+            x,y=case
+            for i in range (len(masse)):
+                delta_x=i*(3/8)/(len(self.jeu.world[case]["bob"]))   
+                delta_y= i*(1/4)/(len(self.jeu.world[case]["bob"]))  
+                self.world.dessiner_bob_adversaire(x, y, self.screen, self.camera.mouvement.x, self.camera.mouvement.y, self.camera.zoom, masse[i], 0, 0)
         
         liste_info_nourriture= self.interface.get_nourritures_adverssaires()
         #print("info nourriture adverssaires",liste_info_nourriture)
