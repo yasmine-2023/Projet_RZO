@@ -208,6 +208,7 @@ class Game:
         #print("info bob adverssaires",liste_info_bob)
         for info in liste_info_bob:
             x,y,masse=info
+            
             self.world.dessiner_bob_adversaire(x, y, self.screen, self.camera.mouvement.x, self.camera.mouvement.y, self.camera.zoom, masse, 0, 0)
         
         liste_info_nourriture= self.interface.get_nourritures_adverssaires()

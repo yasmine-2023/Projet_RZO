@@ -28,7 +28,7 @@ class Pause_menu:
         self.displayed = False
         self.menu_principale = False
         self.new_game = False
-        self.save = False
+        #self.save = False
         self.quitter = False
         
         # Chargement / récupération / mise à l'échelle de l'image du menu pause
@@ -38,11 +38,11 @@ class Pause_menu:
         self.fond_menu = pg.transform.scale(self.fond_menu, (self.longueur_centre_image_menu, self.largeur_centre_image_menu))
     
         # Création bouttons du menu pause
-        self.menu_principale = Button_Pause(self.screen, self.center_x - self.space*1.4, self.center_y - (2*self.space), 'Menu principale')
-        self.new_game        = Button_Pause(self.screen, self.center_x - self.space*1.4, self.center_y - (1*self.space), 'Nouvelle partie')
-        self.save            = Button_Pause(self.screen, self.center_x - self.space*1.4, self.center_y, 'Sauvegarder')
-        self.settings        = Button_Pause(self.screen, self.center_x - self.space*1.4, self.center_y  - (-1*self.space), 'Réglages')
-        self.quitter         = Button_Pause(self.screen, self.center_x - self.space*1.4, self.center_y  - (-2*self.space), 'Quitter le jeu')
+        self.menu_principale = Button_Pause(self.screen, self.center_x - self.space*1.4, self.center_y - (1*self.space), 'Menu principale')
+        self.new_game        = Button_Pause(self.screen, self.center_x - self.space*1.4, self.center_y - (-0.5*self.space), 'Nouvelle partie')
+        #self.save            = Button_Pause(self.screen, self.center_x - self.space*1.4, self.center_y, 'Sauvegarder')
+        self.settings        = Button_Pause(self.screen, self.center_x - self.space*1.4, self.center_y  - (-2*self.space), 'Réglages')
+        self.quitter         = Button_Pause(self.screen, self.center_x - self.space*1.4, self.center_y  - (-3.5*self.space), 'Quitter le jeu')
 
         # Longueur du "Pause" affiché au dessus du menu
         self.title_menu = self.font.render(self.text, True, (255, 0, 0))
@@ -68,9 +68,9 @@ class Pause_menu:
                 return "nouvelle partie"
             
             # Sauvegarde
-            if self.save.check_button(event):
-                self.active=False
-                return "sauvegarder"
+            #if self.save.check_button(event):
+            #    self.active=False
+            #    return "sauvegarder"
 
             # Quitter le jeu
             if self.quitter.check_button(event):
@@ -97,7 +97,7 @@ class Pause_menu:
 
         # Affichage des boutons de notre menu pause
         self.new_game.draw()
-        self.save.draw()
+        #self.save.draw()
         self.menu_principale.draw()
         self.settings.draw()
         self.quitter.draw()

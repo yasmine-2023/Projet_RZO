@@ -389,7 +389,7 @@ class Interface:
                 if confirm == n :
                     self.nb_rep_autre_joueur_abandonne_propriete+=1
 
-                time.sleep(0,1)
+                time.sleep(0.1)
 
             #print("le joueur d'id :"+str(self.idjoueur)+", na pas eu de reponse de l'abandon pour la case :"+str(x)+","+str(y))
         self.coordonnées_abandon=(-1,-1)

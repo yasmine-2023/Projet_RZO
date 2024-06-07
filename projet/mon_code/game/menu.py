@@ -43,7 +43,7 @@ class Menu():
         self.displayed = True
         self.start = False
         self.load = False
-        self.save = False
+        #self.save = False
         self.pause = False
         
 
@@ -51,8 +51,8 @@ class Menu():
         # Méthode pour afficher le menu principal
         if self.displayed:
             # Affichage des bouttons 
-            self.Start_new_game  = Button_Menu(self.screen, self.mid_width, self.mid_height - GAP, 'Nouvelle partie')
-            self.Load_Saved_Game = Button_Menu(self.screen, self.mid_width, self.mid_height, 'Charger partie sauvegarder')
+            self.Start_new_game  = Button_Menu(self.screen, self.mid_width, self.mid_height, 'Nouvelle partie')
+            #self.Load_Saved_Game = Button_Menu(self.screen, self.mid_width, self.mid_height, 'Charger partie sauvegarder')
             self.Options         = Button_Menu(self.screen, self.mid_width, self.mid_height + GAP, 'Options')
             self.Createur        = Button_Menu(self.screen, self.mid_width, self.mid_height + (2 * GAP), 'Createur')
             self.Exit            = Button_Menu(self.screen, self.mid_width, self.mid_height + (3 * GAP), 'Exit')
@@ -66,9 +66,9 @@ class Menu():
                 return "nouvelle partie"
 
             # Chargmeent d'une partie sauvegardé
-            if self.Load_Saved_Game.check_button(event):
-                self.active=False
-                return "reprendre"
+            #if self.Load_Saved_Game.check_button(event):
+            #    self.active=False
+            #    return "reprendre"
 
             # Quiter le jeu
             if self.Exit.check_button(event):
@@ -107,7 +107,7 @@ class Menu():
 
         # Pour afficher les bouttons
         self.Start_new_game.draw()
-        self.Load_Saved_Game.draw()
+        #self.Load_Saved_Game.draw()
         self.Createur.draw()
         self.Options.draw()
         self.Exit.draw()
