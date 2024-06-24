@@ -34,7 +34,7 @@ class Nourriture():
     def set_position(self, x, y):
         self.x=x
         self.y=y
-     
+    
     def __str__(self)    :
         global num_nourriture
         return "nourriture ("+str(self.x)+","+str(self.y)+") energie="+str(self.energie_nourriture)
@@ -61,9 +61,6 @@ class Nourriture():
        
         jeu.world[(self.x, self.y)]["nourriture"] = self
         print("Je mets à jour mon dictionnaire, je rajoute la nourriture :", jeu.world[(self.x, self.y)]["nourriture"])
-
-
-
 
 
 

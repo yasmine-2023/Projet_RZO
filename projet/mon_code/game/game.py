@@ -87,7 +87,7 @@ class Game:
             screen.blit(game_over_image,(self.screen.get_width()/3,self.screen.get_height()/3))
             self.button_return.afficher(self.screen)
             pg.display.flip()
-            self.clock.tick(60)
+            self.clock.tick(30)
 
 
     def events(self):
@@ -95,6 +95,7 @@ class Game:
         # Méthode pour gérer les événements du jeu
         for event in pg.event.get():
             if event.type == pg.QUIT:
+                self.interface.stop_game()
                 pg.quit()
                 sys.exit()
             elif event.type == pg.KEYDOWN:
@@ -139,7 +140,7 @@ class Game:
         
         while self.playing:
             next=self.events() # pour quitter
-            self.clock.tick(40) # nombre de FPS
+            self.clock.tick(30) # nombre de FPS
             self.update() # pour initialiser
 
             current_time = pg.time.get_ticks()
@@ -184,12 +185,15 @@ class Game:
         pg.draw.rect(self.screen, barre_couleur_opt, (barre_position_x_opt, barre_position_y_opt, self.screen.get_width(), self.screen.get_height() - self.screen.get_height()*0.96))
         
         for case, elmts in self.jeu.world.items():
+            liste_info_bob= self.interface.get_info_adversaire()
+            
             i,j=case                            
             for k in elmts.keys():
                 if k=="bob":
+                    nTotal = nombreBobCase(i,j,self.jeu.world,liste_info_bob)
                     for num, bob in enumerate(self.jeu.world[case]["bob"]): 
-                        delta_x=num*(3/8)/(len(self.jeu.world[case]["bob"]))   
-                        delta_y= num*(1/4)/(len(self.jeu.world[case]["bob"]))  
+                        delta_x=num*(3/8)/nTotal   
+                        delta_y= num*(1/4)/nTotal  
 
                         # Dessiner les bobs : 
                         if bob.eSpawn >0:                                                                 
@@ -203,18 +207,31 @@ class Game:
                     n_food+=1
 
         self.nb_bob, self.nb_food = n_bob, n_food
-        liste_info_bob= self.interface.get_info_adversaire()
+        
+        
+
+
         
         #print("info bob adverssaires",liste_info_bob)
-        dict =dict_bob_adv(liste_info_bob)
-        for case,masse in dict:
+        dict = dict_bob_adv(liste_info_bob)
+        for case in dict:
             x,y=case
-            for i in range (len(masse)):
-                delta_x=i*(3/8)/(len(self.jeu.world[case]["bob"]))   
-                delta_y= i*(1/4)/(len(self.jeu.world[case]["bob"]))  
-                self.world.dessiner_bob_adversaire(x, y, self.screen, self.camera.mouvement.x, self.camera.mouvement.y, self.camera.zoom, masse[i], 0, 0)
+            nTotal = nombreBobCase(x,y,self.jeu.world,liste_info_bob)
+            if(x,y) in self.jeu.world and "bob" in self.jeu.world[case]:
+                nb_dessine = len(self.jeu.world[case]["bob"])
+            else:
+                nb_dessine=0
+            print("ma case test yas",case)
+            for num, taille in enumerate(dict[case]): 
+                            delta_x=(num+nb_dessine)*(3/8)/nTotal  
+                            delta_y= (num+nb_dessine)*(1/4)/nTotal
+                            self.world.dessiner_bob_adversaire(x, y, self.screen, self.camera.mouvement.x, self.camera.mouvement.y, self.camera.zoom, taille, delta_x, delta_y)
+            
+        
         
         liste_info_nourriture= self.interface.get_nourritures_adverssaires()
+        
+           
         #print("info nourriture adverssaires",liste_info_nourriture)
         
         if(liste_info_nourriture):
@@ -222,11 +239,6 @@ class Game:
                 x,y=info2
                 self.world.dessiner_nourriture_adversaire(x, y, self.screen, self.camera.mouvement.x, self.camera.mouvement.y, self.camera.zoom)
 
-        
-
-            
-
- 
         # Pour déssiner la barre d'info des jours et du cycle jour/nuit
         self.world.draw_day_night_bar(self.screen, self.jeu.get_tick(), self.jeu.get_tick_jour())
         self.world.draw_day_count(self.screen, self.jeu.get_jour())
@@ -250,7 +262,6 @@ class Game:
 
         # A chaque fin de boucle on actualise notre map
         pg.display.flip()
-
 
     def draw_rendering_img(self):
         rendering_image_draw = rendering_image

@@ -125,7 +125,7 @@ class Menu():
             while run:
                 self.screen.blit(self.background, (0, 0))
 
-                names = ["Bob Land a Game centred around a visual ","and interactive simulation of natural selection","created by :", "Morad", "Aymen", "Yassmine", "Oumaima", "Maxime", "Yassine"]
+                names = ["Bob Land a Game centred around a visual ","and interactive simulation of natural selection","created by :","Yasmine", "Lucien", "Cedric", "Mariame"]
                 for i, name in enumerate(names):
                     text_surface = self.font.render(name, True, (0, 0, 0))  # (0, 0, 0) représente la couleur noire
                     text_rect = text_surface.get_rect()

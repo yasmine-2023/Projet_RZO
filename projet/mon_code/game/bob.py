@@ -547,6 +547,7 @@ class Bob():
     
 
     def consommation(self, world, position): 
+        #print("Mon dictionnaire contient les nourritures",world[position]["nourriture"].get_energie())
         if "nourriture" in world[position]:
             nourriture_max=world[position]["nourriture"]
             self.eat_food(world, nourriture_max)

@@ -51,14 +51,29 @@ class World:
 
 
 
-    def dessiner_bob_adversaire(self, i ,j, fenetre, camera_x, camera_y, zoom, masse, delta_x, delta_y):
-        masse=(masse)**(1/3)
-        img_bob_z=pg.transform.scale(self.img_bob_adversaire, ((self.img_bob_adversaire.get_width()*zoom*masse), (self.img_bob_adversaire.get_height()*zoom*masse)))          
-        img_tuile_z=pg.transform.scale(self.img_tuile, ((self.img_tuile.get_width()*zoom), (self.img_tuile.get_height()*zoom)))
-        x,y=self.calculer_x_y(i,j)
-        fenetre.blit(img_bob_z, 
-                        (x*zoom + fenetre.get_width()/2 +img_tuile_z.get_width()/2+img_tuile_z.get_width()*delta_x-img_bob_z.get_width()/2+ camera_x,  
-                        y*zoom +img_tuile_z.get_height()/8+img_tuile_z.get_height()*delta_y-img_bob_z.get_height()/2+ camera_y))    
+    def dessiner_bob_adversaire(self, i ,j, fenetre, camera_x, camera_y, zoom, taille, delta_x, delta_y):
+        taille = (taille) ** (1/3)
+        agrandir_facteur = 1.1 # Augmentez cette valeur pour agrandir davantage
+        
+        # Mise à l'échelle de l'image de bob avec le facteur d'agrandissement
+        nouvelle_largeur = int(self.img_bob_adversaire.get_width() * zoom * taille * agrandir_facteur)
+        nouvelle_hauteur = int(self.img_bob_adversaire.get_height() * zoom * taille * agrandir_facteur)
+        img_bob_z = pg.transform.scale(self.img_bob_adversaire, (nouvelle_largeur, nouvelle_hauteur))
+        
+        # Mise à l'échelle de l'image de tuile
+        img_tuile_z = pg.transform.scale(self.img_tuile, (
+            int(self.img_tuile.get_width() * zoom),
+            int(self.img_tuile.get_height() * zoom)
+        ))
+        
+        x, y = self.calculer_x_y(i, j)
+        
+        # Calcul de la position de blit
+        position_x = x * zoom + fenetre.get_width() / 2 + img_tuile_z.get_width() / 2 + img_tuile_z.get_width() * delta_x - img_bob_z.get_width() / 2 + camera_x
+        position_y = y * zoom + img_tuile_z.get_height() / 8 + img_tuile_z.get_height() * delta_y - img_bob_z.get_height() / 2 + camera_y
+        
+        # Blit de l'image agrandie de bob
+        fenetre.blit(img_bob_z, (position_x, position_y))
 
 
 #################

@@ -1,6 +1,6 @@
 from game.ftRZO import *
 from game.nourriture import *
-
+import  time 
 class Case:
     def __init__(self, x, y):
         self.x = x
@@ -26,23 +26,23 @@ class Case:
         return self.proprietaire 
     
     def gerer_propriete(self,interface):
-        print("la valeur du proprietaire test3",self.proprietaire)
+        # print("la valeur du proprietaire de la case de coordoné:",self.x,",",self.y,"; est ",self.proprietaire)
         if (not self.je_possede_propriete()):
                 val=interface.autre_joueur_abandonne_propriete(self.x,self.y)
-                print("valeur de l'energie test2 yas",val)
-                self.prendre_propriete(interface.jeu) #prendre propriété de la case
-    
+                time.sleep(0.1)
+                # print("valeur de l'energie de la case  de coordonnée:",self.x,",",self.y," ; que possede un autre joueur est ",val)
+                self.prendre_propriete(interface.jeu)
+                time.sleep(0.1) #prendre propriété de la case
                 if val>0:
-                    print("test4 J'ai trouvé un nourriture dans la case(",self.x,",",self.y,")",)
+                    # print("je demande aux autres de laisser la propriete de la nourriture de coordonnée :",self.x,",",self.y)
                     interface.adverssaire_abandonne_nourriture(self.x,self.y)
+                    time.sleep(0.1)
                     nourriture = Nourriture()
                     nourriture.set_position(self.x,self.y)
                     nourriture.set_energie(val)
-                    print("On vient de créé uune nouvelle nourriture de position:(",self.x,",",self.y,") et d'energie",val)
-                    nourriture.prendre_propriete(interface.jeu)  #prendre propriété du contenue de la case
-                    print("je prend la propriete de la nourriture de position:(",self.x,",",self.y,")" )
-                    
-    
+                    nourriture.prendre_propriete(interface.jeu)
+                    time.sleep(0.1)#prendre propriété du contenue de la case
+                    # print("je devrai avoir bien pris la propriete et nourriture la case de coordoné:",self.x,",",self.y)
 
     
     

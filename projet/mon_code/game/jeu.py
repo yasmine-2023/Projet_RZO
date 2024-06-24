@@ -1,7 +1,7 @@
 from glob import glob
 import random
 from game.bob import *
-
+import time
 from game.joueur import Joueur
 from game.nourriture import *
 from game.methods import *
@@ -40,6 +40,7 @@ class Jeu():
         self.interface = Interface(self)
         self.interface.start_game()
         self.joueur=Joueur(self.interface.create_id())
+        time.sleep(0.2)
         self.idjoueur =self.interface.get_mon_id()
         self.genere_objet("bob")
         self.genere_nourriture()
@@ -114,6 +115,9 @@ class Jeu():
                         bob.effacer_bob(self.world,case)
         self.interface.give_info()
         self.interface.give_info_nourriture()
+        time.sleep(0.3)
+        print("je lance synchro dans boucle jeu")
+        self.interface.synchronisation_joueurs()
  
     def genere_objet(self,option):
         joueur = self.get_mon_joueur() # joueur = joueur1
@@ -128,8 +132,9 @@ class Jeu():
             pos_j = random.randint(0, self.world_y - 1)
             case = get_Case(self.listeCases,pos_i,pos_j)
             i+=1
-            print("mon nombre de bob créé est",self.nourriture_créé,"sur les :",self.totale_nourriture,"j'en suis a mon iteration numero:",i)
+            print("je vais apple la fonction reseau -----------------------")
             if (case is not None and( case.je_possede_propriete()==True or self.interface.autre_Joueur_Possede_Case(pos_i,pos_j) == 0)):
+                print("jpreussie")
                 if option=="bob":
                     new_objet = Bob() 
                     self.bob_créé+=1
@@ -159,7 +164,7 @@ class Jeu():
             pos_j = random.randint(0, self.world_y - 1)
             case = get_Case(self.listeCases,pos_i,pos_j)
             i+=1
-            print("mon nombre de nourriture créé est",self.nourriture_créé,"sur les :",self.totale_nourriture,"j'en suis a mon iteration numero:",i)
+            #print("mon nombre de nourriture créé est",self.nourriture_créé,"sur les :",self.totale_nourriture,"j'en suis a mon iteration numero:",i)
             if( case is not None ):
                if case.je_possede_propriete() or self.interface.autre_Joueur_Possede_Case(pos_i,pos_j) == 0:
                 new_objet= Nourriture()
@@ -209,9 +214,7 @@ class Jeu():
     #retourne l'energie de la nouriture si elle existe sinon 0    
     def check_nourriture_existe(self, x, y):
         if (x, y) in self.world:
-            print("j'ai trouvé une nourriture dans la case")
             if "nourriture" in self.world[x, y]:
-                print("La ft check nourriture existe retourne ", self.world[x, y]["nourriture"].get_energie())
                 return self.world[x, y]["nourriture"].get_energie()
         return 0 
 

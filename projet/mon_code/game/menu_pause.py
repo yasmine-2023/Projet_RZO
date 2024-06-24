@@ -74,6 +74,8 @@ class Pause_menu:
 
             # Quitter le jeu
             if self.quitter.check_button(event):
+                print("on a stop game")
+                self.lanceur.jeu.interface.stop_game()
                 self.active = False
                 sys.exit()
 
